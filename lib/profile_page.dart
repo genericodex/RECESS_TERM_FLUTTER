@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-// class ProfilePage extends StatefulWidget {
-//   const ProfilePage({super.key});
-//
-//   @override
-//   _ProfilePageState createState() => _ProfilePageState();
-// }
-//
-// class _ProfilePageState extends State<ProfilePage> {
-//   final TextEditingController _nameController = TextEditingController();
-//   final TextEditingController _emailController = TextEditingController();
-//   final TextEditingController _phoneController = TextEditingController();
-//   File? _image;
-//
-//   Future<void> _pickImage() async {
-//     final ImagePicker picker = ImagePicker();
+ class ProfilePage extends StatefulWidget {
+   const ProfilePage({super.key});
+
+   @override
+   _ProfilePageState createState() => _ProfilePageState();
+ }
+
+ class _ProfilePageState extends State<ProfilePage> {
+   final TextEditingController _nameController = TextEditingController();
+   final TextEditingController _emailController = TextEditingController();
+   final TextEditingController _phoneController = TextEditingController();
+   File? _image;
+
+   Future<void> _pickImage() async {
+     final ImagePicker picker = ImagePicker();
 //     final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
 //     if (pickedImage != null) {
 //       setState(() {
