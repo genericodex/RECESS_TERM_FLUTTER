@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:motion_tab_bar/MotionBadgeWidget.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
+import 'pages/appointments_page.dart';
+import 'pages/profile_page.dart';
+import 'pages/notifications_page.dart';
+import 'pages/call_doctor_page.dart';
+import 'pages/make_appointment_page.dart';
+import 'pages/emergency_page.dart';
+import 'pages/feedback_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -131,10 +138,10 @@ class HomePage extends StatelessWidget {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
-                _buildGridItem(Icons.call, 'Call doctor'),
-                _buildGridItem(Icons.medication, 'Make Appointment'),
-                _buildGridItem(Icons.emergency, 'Emergency', color: Color.fromARGB(255, 193, 15, 15)),
-                _buildGridItem(Icons.feedback, 'Feedback'),
+                _buildGridItem(Icons.call, 'Call doctor', context, CallDoctorPage()),
+                _buildGridItem(Icons.medication, 'Make Appointment', context, MakeAppointmentPage()),
+                _buildGridItem(Icons.emergency, 'Emergency', context, EmergencyPage(), color: Color.fromARGB(255, 193, 15, 15)),
+                _buildGridItem(Icons.feedback, 'Feedback', context, FeedbackPage()),
               ],
             ),
           ),
@@ -143,7 +150,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildGridItem(IconData icon, String title, {Color color = Colors.black}) {
+  Widget _buildGridItem(IconData icon, String title, BuildContext context, Widget page, {Color color = Colors.black}) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.all(16),
@@ -152,7 +159,10 @@ class HomePage extends StatelessWidget {
         ),
       ),
       onPressed: () {
-        // Add your onPressed code here!
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -169,29 +179,16 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class AppointmentsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Appointments Page'),
-    );
-  }
-}
 
-class ProfilePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Profile Page'),
-    );
-  }
-}
 
-class NotificationsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Notifications Page'),
-    );
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
