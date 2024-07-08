@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "76937627117",
+    "project_id": "e-mergencyapp-bcacf",
+    "storage_bucket": "e-mergencyapp-bcacf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76937627117:android:8974ace6358e94a1da93e4",
+        "android_client_info": {
+          "package_name": "com.example.e_mergency_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvYy3-h2fyWex-XwpE-6h0r2RKNIxlC7k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

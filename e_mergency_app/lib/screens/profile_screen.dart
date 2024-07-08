@@ -26,11 +26,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-      ),
+      // appBar: AppBar(
+      //   title: Text('Profile'),
+      //   backgroundColor: Colors.black,
+      //   foregroundColor: Colors.white,
+      // ),
       body: Container(
         color: Color.fromARGB(255, 221, 246, 219),
         child: Center(
@@ -38,8 +38,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                Text('My profile',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.black),
+                ),
+                SizedBox(height: 60,),
                 CircleAvatar(
                   radius: 50,
                   backgroundImage: AssetImage('assets/photos/user1.jpg'),
@@ -47,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(height: 20),
                 Text(
                   '${_user.firstName} ${_user.lastName}',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.black),
                 ),
                 SizedBox(height: 10),
                 Text(
