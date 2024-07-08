@@ -9,6 +9,7 @@ import 'pages/call_doctor_page.dart';
 import 'pages/make_appointment_page.dart';
 import 'pages/emergency_page.dart';
 import 'pages/feedback_page.dart';
+import 'pages/emergency_sequence/emergency_location_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -159,10 +160,14 @@ class HomePage extends StatelessWidget {
         ),
       ),
       onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => page),
-        );
+        if (title == 'Emergency') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EmergencyLocationPage()),
+          );
+        } else {
+          //Handle other button presses
+        }
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
