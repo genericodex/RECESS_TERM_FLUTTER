@@ -24,12 +24,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
         textSelectionTheme:
-            const TextSelectionThemeData(cursorColor: Colors.orange),
+            const TextSelectionThemeData(cursorColor: Color.fromARGB(255, 120, 231, 178)),
         textTheme: TextTheme(
           displaySmall: const TextStyle(
             fontFamily: 'OpenSans',
             fontSize: 45.0,
-            color: Colors.orange,
+            color: Color.fromARGB(255, 120, 231, 178),
           ),
           labelLarge: const TextStyle(
             fontFamily: 'OpenSans',
@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
           labelSmall: const TextStyle(fontFamily: 'NotoSans'),
         ),
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.grey)
-            .copyWith(secondary: Colors.orange),
+            .copyWith(secondary: Color.fromARGB(255, 120, 231, 178)),
       ),
       
       debugShowCheckedModeBanner: false,
