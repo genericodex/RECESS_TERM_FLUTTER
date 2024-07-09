@@ -108,10 +108,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       appBar: AppBar(
         title: Text(
           "StudentCARE",
-          style: TextStyle(color: Color.fromARGB(255, 20, 102, 89)),
+          style: TextStyle(color: Color.fromARGB(255, 233, 240, 239)),
         ),
         centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 225, 255, 247),
+        backgroundColor: Color.fromARGB(255, 24, 176, 123),
       ),
       bottomNavigationBar: MotionTabBar(
         controller: _motionTabBarController,
@@ -156,52 +156,63 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 243, 237),
       body: Padding(
-       padding: const EdgeInsets.all(16.0),
-       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            color: Colors.greenAccent[300],
-            padding: EdgeInsets.all(16.0),
-            width: double.infinity,
-            child:Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hello,\nPius Ssozi.',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              
-            
-          
-                SizedBox(height: 16),
-                Text(
-                  'Welcome to StudentCARE',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ],
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              color: Color.fromARGB(255, 120, 231, 178),
+              padding: EdgeInsets.all(16.0),
+              height: 280,
+              width: double.infinity,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hello,\nPius Ssozi.',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Welcome to \nStudentCARE',
+                          style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 209, 23, 23)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Image.asset(
+                    'assets/images/doctor.jpg',
+                    width: 150, // adjust the width as needed
+                    height: 220, // adjust the height as needed
+                    fit: BoxFit.cover, // adjust the fit as needed
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(height: 16),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              children: [
-                _buildGridItem(LineIcons.phone, 'Call doctor', context, CallDoctorPage(), color: Color.fromARGB(255, 38, 163, 143)),
-                _buildGridItem(LineIcons.medicalClinic, 'Make Appointment', context, MakeAppointmentPage(), color: Color.fromARGB(255, 38, 163, 143)),
-                _buildGridItem(LineIcons.ambulance, 'Emergency', context, EmergencyPage(), color: Color.fromARGB(255, 38, 163, 143)),
-                _buildGridItem(LineIcons.envelope, 'Feedback', context, FeedbackPage(), color: Color.fromARGB(255, 38, 163, 143)),
-              ],
+            SizedBox(height: 16),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: [
+                  _buildGridItem(LineIcons.medicalClinic, 'Make Appointment', context, MakeAppointmentPage(), color: Color.fromARGB(255, 38, 163, 143)),
+                  _buildGridItem(LineIcons.ambulance, 'Emergency', context, EmergencyPage(), color: Color.fromARGB(255, 209, 23, 23)),
+                  _buildGridItem(LineIcons.envelope, 'Feedback', context, FeedbackPage(), color: Color.fromARGB(255, 38, 163, 143)),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
+}
 
-  Widget _buildGridItem(IconData icon, String title, BuildContext context, Widget page, {Color color = Colors.black}) {
+Widget _buildGridItem(IconData icon, String title, BuildContext context, Widget page, {Color color = Colors.black}) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.all(16),
@@ -235,4 +246,4 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-}
+
