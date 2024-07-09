@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:motion_tab_bar/MotionBadgeWidget.dart';
+import 'login_package.dart'; 
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
 import 'pages/appointments_page.dart';
@@ -10,6 +10,7 @@ import 'pages/make_appointment_page.dart';
 import 'pages/emergency_page.dart';
 import 'pages/feedback_page.dart';
 import 'pages/emergency_sequence/emergency_location_page.dart';
+import 'package:line_icons/line_icons.dart';
 
 void main() => runApp(MyApp());
 
@@ -19,12 +20,46 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Motion Tab Bar Sample',
+      title: 'Student Care',
       theme: ThemeData(
         primarySwatch: Colors.green,
+        textSelectionTheme:
+            const TextSelectionThemeData(cursorColor: Colors.orange),
+        textTheme: TextTheme(
+          displaySmall: const TextStyle(
+            fontFamily: 'OpenSans',
+            fontSize: 45.0,
+            color: Colors.orange,
+          ),
+          labelLarge: const TextStyle(
+            fontFamily: 'OpenSans',
+          ),
+          bodySmall: TextStyle(
+            fontFamily: 'NotoSans',
+            fontSize: 12.0,
+            fontWeight: FontWeight.normal,
+            color: Colors.greenAccent[300],
+          ),
+          displayLarge: const TextStyle(fontFamily: 'Quicksand'),
+          displayMedium: const TextStyle(fontFamily: 'Quicksand'),
+          headlineMedium: const TextStyle(fontFamily: 'Quicksand'),
+          headlineSmall: const TextStyle(fontFamily: 'NotoSans'),
+          titleLarge: const TextStyle(fontFamily: 'NotoSans'),
+          titleMedium: const TextStyle(fontFamily: 'NotoSans'),
+          bodyLarge: const TextStyle(fontFamily: 'NotoSans'),
+          bodyMedium: const TextStyle(fontFamily: 'NotoSans'),
+          titleSmall: const TextStyle(fontFamily: 'NotoSans'),
+          labelSmall: const TextStyle(fontFamily: 'NotoSans'),
+        ),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.grey)
+            .copyWith(secondary: Colors.orange),
       ),
+      
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(),
+      initialRoute: LoginScreen.routeName,
+      routes: {LoginScreen.routeName:(context) => const LoginPackage(),
+      MyHomePage.routeName:(context) => const MyHomePage()},
+       // Set the initial route to the LoginPackage
     );
   }
 }
@@ -33,6 +68,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, this.title}) : super(key: key);
 
   final String? title;
+  static const String routeName = '/home'; // Define a route name
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -71,34 +107,33 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Student Care",
-          style: TextStyle(color: Color.fromARGB(255, 251, 202, 84)),
+          "StudentCARE",
+          style: TextStyle(color: Color.fromARGB(255, 20, 102, 89)),
         ),
         centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 1, 150, 68),
+        backgroundColor: Color.fromARGB(255, 225, 255, 247),
       ),
       bottomNavigationBar: MotionTabBar(
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
         useSafeArea: true,
-        labels: const ["Appointments", "Home", "Profile", "Notifications"],
+        labels: const ["Appointments", "Home", "Notifications"],
         icons: const [
-          Icons.calendar_today,
-          Icons.home,
-          Icons.people_alt,
-          Icons.notifications
+          LineIcons.calendar,
+          LineIcons.home,
+          LineIcons.bell,
         ],
         tabSize: 50,
         tabBarHeight: 55,
         textStyle: const TextStyle(
           fontSize: 12,
-          color: Color.fromARGB(255, 193, 15, 15),
+          color: Color.fromARGB(255, 38, 163, 143),
           fontWeight: FontWeight.w500,
         ),
-        tabIconColor: Color.fromARGB(255, 198, 192, 188),
+        tabIconColor: Color.fromARGB(255, 133, 134, 136),
         tabIconSize: 28.0,
         tabIconSelectedSize: 26.0,
-        tabSelectedColor: Color.fromARGB(255, 1, 150, 68),
+        tabSelectedColor: Color.fromARGB(255, 38, 163, 143),
         tabIconSelectedColor: Colors.white,
         tabBarColor: Colors.white,
         onTabItemSelected: (int value) {
@@ -118,19 +153,34 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
+    return Scaffold(
+      backgroundColor: Color.fromARGB(255, 241, 243, 237),
+      body: Padding(
+       padding: const EdgeInsets.all(16.0),
+       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Hello,\nPius Ssozi.',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Welcome to Student Care',
-            style: TextStyle(fontSize: 18),
+          Container(
+            color: Colors.greenAccent[300],
+            padding: EdgeInsets.all(16.0),
+            width: double.infinity,
+            child:Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hello,\nPius Ssozi.',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              
+            
+          
+                SizedBox(height: 16),
+                Text(
+                  'Welcome to StudentCARE',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
           ),
           SizedBox(height: 16),
           Expanded(
@@ -139,16 +189,16 @@ class HomePage extends StatelessWidget {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
-                _buildGridItem(Icons.call, 'Call doctor', context, CallDoctorPage()),
-                _buildGridItem(Icons.medication, 'Make Appointment', context, MakeAppointmentPage()),
-                _buildGridItem(Icons.emergency, 'Emergency', context, EmergencyPage(), color: Color.fromARGB(255, 193, 15, 15)),
-                _buildGridItem(Icons.feedback, 'Feedback', context, FeedbackPage()),
+                _buildGridItem(LineIcons.phone, 'Call doctor', context, CallDoctorPage(), color: Color.fromARGB(255, 38, 163, 143)),
+                _buildGridItem(LineIcons.medicalClinic, 'Make Appointment', context, MakeAppointmentPage(), color: Color.fromARGB(255, 38, 163, 143)),
+                _buildGridItem(LineIcons.ambulance, 'Emergency', context, EmergencyPage(), color: Color.fromARGB(255, 38, 163, 143)),
+                _buildGridItem(LineIcons.envelope, 'Feedback', context, FeedbackPage(), color: Color.fromARGB(255, 38, 163, 143)),
               ],
             ),
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildGridItem(IconData icon, String title, BuildContext context, Widget page, {Color color = Colors.black}) {
@@ -166,34 +216,23 @@ class HomePage extends StatelessWidget {
             MaterialPageRoute(builder: (context) => EmergencyLocationPage()),
           );
         } else {
-          //Handle other button presses
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => page),
+          );
         }
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 48),
+          Icon(icon, size: 48, color: color),
           SizedBox(height: 8),
           Text(
             title,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 20, 102, 89)),
           ),
         ],
       ),
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
