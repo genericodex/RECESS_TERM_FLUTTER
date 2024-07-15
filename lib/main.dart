@@ -113,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         centerTitle: true,
         backgroundColor: Color.fromARGB(255, 24, 176, 123),
       ),
+      drawer: Drawer(),
       bottomNavigationBar: MotionTabBar(
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
