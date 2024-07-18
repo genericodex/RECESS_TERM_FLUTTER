@@ -7,11 +7,9 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  GoogleMapController? _controller;
   final LatLng _initialPosition = LatLng(0.0, 0.0);
 
   void _onMapCreated(GoogleMapController controller) {
-    _controller = controller;
   }
 
   @override
