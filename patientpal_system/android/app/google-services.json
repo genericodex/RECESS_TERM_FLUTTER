@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "695706272849",
+    "project_id": "patientpal-system",
+    "storage_bucket": "patientpal-system.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695706272849:android:3301a448249373c2186470",
+        "android_client_info": {
+          "package_name": "com.example.patientpal_system"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-CXVvC2v0Kli4RzbyvGwttvUEuhlixI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695706272849:android:e3e1fade39bf4b5e186470",
+        "android_client_info": {
+          "package_name": "patientpal.i256"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-CXVvC2v0Kli4RzbyvGwttvUEuhlixI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
