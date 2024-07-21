@@ -225,7 +225,7 @@ Widget _buildGridItem(IconData icon, String title, BuildContext context, Widget 
         if (title == 'Emergency') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => EmergencyLocationPage()),
+            MaterialPageRoute(builder: (context) => CenterPage()),
           );
         } else {
           Navigator.push(
