@@ -8,7 +8,7 @@ class LoginPackage extends StatelessWidget {
   const LoginPackage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+ Widget build(BuildContext context) {
     return Scaffold(
       body: LoginScreen(),
     );   
