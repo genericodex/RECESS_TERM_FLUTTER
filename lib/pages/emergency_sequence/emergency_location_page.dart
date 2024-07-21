@@ -37,7 +37,7 @@ class _CenterPageState extends State<CenterPage>
     // Implement the SOS button functionality here
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CurrentLocationPage()),
+      MaterialPageRoute(builder: (context) => LocationScreen()),
     );
   }
 
