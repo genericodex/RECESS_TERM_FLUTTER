@@ -1,126 +1,85 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
+import 'package:intl/intl.dart';
 
 class AppointmentProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> createAppointment(String patientId, String ailmentType, DateTime dateTime) async {
-    DateTime appointmentDateTime = dateTime;
-    String appointmentDay = _getDayOfWeekString(appointmentDateTime.weekday); // Use a function to get day as a string
-    TimeOfDay appointmentTime = TimeOfDay.fromDateTime(appointmentDateTime);
+  Future<List<String>> getAvailableTimeSlots(DateTime date) async {
+    List<String> timeSlots = [];
+    QuerySnapshot querySnapshot = await _firestore.collection('time_slots')
+        .where('date', isEqualTo: date.toIso8601String().split('T')[0])
+        .get();
 
-    print('Searching for doctors in department: $ailmentType');
-    print('Appointment date and time: ${appointmentDateTime.toLocal()}');
-    print('Appointment day: $appointmentDay');
+    for (var doc in querySnapshot.docs) {
+      timeSlots.add(doc['time']);
+    }
 
-    QuerySnapshot doctorsSnapshot = await _firestore.collection('doctors')
+    return timeSlots;
+  }
+
+  Future<void> createAppointment(
+    String userId,
+    String ailmentType,
+    DateTime dateTime,
+  ) async {
+    try {
+      // Fetch available doctor
+      var doctor = await _getAvailableDoctor(ailmentType, dateTime);
+
+      if (doctor == null) {
+        throw Exception('No available doctors for the selected date and time');
+      }
+
+      await _firestore.collection('appointments').add({
+        'patient_id': userId,
+        'doctor_id': doctor['uid'],
+        'Doctor': doctor['name'],
+        'ailment_type': ailmentType,
+        'date_time': dateTime,
+        'status': 'Booked',
+      });
+    } catch (e) {
+      throw Exception('Failed to create appointment: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>?> _getAvailableDoctor(String ailmentType, DateTime dateTime) async {
+    QuerySnapshot querySnapshot = await _firestore.collection('doctors')
         .where('department', isEqualTo: ailmentType)
         .get();
 
-    if (doctorsSnapshot.docs.isEmpty) {
-      throw Exception('No doctors found in the specified department');
-    }
+    String selectedDay = DateFormat('EEEE').format(dateTime); // e.g., 'Monday'
+    String selectedTime = DateFormat.Hm().format(dateTime); // e.g., '10:00'
 
-    for (var doc in doctorsSnapshot.docs) {
-      Map<String, dynamic>? doctorData = doc.data() as Map<String, dynamic>?;
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> doctor = doc.data() as Map<String, dynamic>;
 
-      if (doctorData == null) {
-        continue;
-      }
+      // Convert the array structure of working_days to a list
+      List<String> workingDays = List<String>.from(doctor['work_days']);
 
-      print('Checking doctor: ${doctorData['name']}');
-      List<dynamic>? workDaysList = doctorData['work_days'];
-      List<String> workDays = workDaysList != null ? List<String>.from(workDaysList) : [];
+      Map<String, String> workingHours = Map<String, String>.from(doctor['work_hours']);
 
-      Map<String, dynamic>? workHoursMap = doctorData['work_hours'];
-      Map<String, String> workHours = workHoursMap != null ? Map<String, String>.from(workHoursMap) : {};
-
-      print('Doctor work days: $workDays');
-      print('Doctor work hours: $workHours');
-
-      if (workDays.contains(appointmentDay)) {
-        String? startHourStr = workHours['start'];
-        String? endHourStr = workHours['end'];
-
-        if (startHourStr != null && endHourStr != null) {
-          TimeOfDay startTime = _parseTime(startHourStr);
-          TimeOfDay endTime = _parseTime(endHourStr);
-
-          print('Doctor start time: ${_formatTimeOfDay(startTime)}');
-          print('Doctor end time: ${_formatTimeOfDay(endTime)}');
-
-          if (_isTimeWithinRange(appointmentTime, startTime, endTime)) {
-            print('Found matching doctor: ${doctorData['name']}');
-
-            await _firestore.collection('appointments').add({
-              'patient_id': patientId,
-              'doctor_id': doc.id,
-              'ailment_type': ailmentType,
-              'date_time': Timestamp.fromDate(appointmentDateTime),
-              'status': 'Scheduled',
-            });
-
-            await _firestore.collection('notifications').add({
-              'doctor_id': doc.id,
-              'message': 'You have a new appointment',
-              'date_time': Timestamp.now(),
-            });
-
-            notifyListeners(); // Notify listeners that the appointment was created
-            return;
-          } else {
-            print('Appointment time not within doctor\'s working hours.');
-          }
-        } else {
-          print('Doctor work hours are not properly set.');
-        }
-      } else {
-        print('Doctor does not work on this day.');
+      if (workingDays.contains(selectedDay) &&
+          _isWithinWorkingHours(selectedTime, workingHours['start']!, workingHours['end']!)) {
+        return doctor;
       }
     }
 
-    throw Exception('No matching doctor available for the selected date and time');
+    return null;
+  }
+
+  bool _isWithinWorkingHours(String selectedTime, String start, String end) {
+    TimeOfDay selected = _parseTime(selectedTime);
+    TimeOfDay startTime = _parseTime(start);
+    TimeOfDay endTime = _parseTime(end);
+
+    return (selected.hour > startTime.hour || (selected.hour == startTime.hour && selected.minute >= startTime.minute)) &&
+           (selected.hour < endTime.hour || (selected.hour == endTime.hour && selected.minute <= endTime.minute));
   }
 
   TimeOfDay _parseTime(String time) {
-  final parts = time.split(':');
-  int hour = int.parse(parts[0]);
-  final int minute = int.parse(parts[1]);
-  return TimeOfDay(hour: hour, minute: minute);
-}
-
-  bool _isTimeWithinRange(TimeOfDay time, TimeOfDay start, TimeOfDay end) {
-    final current = Duration(hours: time.hour, minutes: time.minute);
-    final startDuration = Duration(hours: start.hour, minutes: start.minute);
-    final endDuration = Duration(hours: end.hour, minutes: end.minute);
-    return current >= startDuration && current <= endDuration;
-  }
-
-  String _formatTimeOfDay(TimeOfDay time) {
-    final hours = time.hour.toString().padLeft(2, '0');
-    final minutes = time.minute.toString().padLeft(2, '0');
-    return '$hours:$minutes';
-  }
-
-  String _getDayOfWeekString(int weekday) {
-    switch (weekday) {
-      case 1:
-        return 'Monday';
-      case 2:
-        return 'Tuesday';
-      case 3:
-        return 'Wednesday';
-      case 4:
-        return 'Thursday';
-      case 5:
-        return 'Friday';
-      case 6:
-        return 'Saturday';
-      case 7:
-        return 'Sunday';
-      default:
-        return '';
-    }
+    final format = DateFormat.Hm(); // 'HH:mm'
+    return TimeOfDay.fromDateTime(format.parse(time));
   }
 }

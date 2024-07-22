@@ -8,7 +8,12 @@ class EmergencyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Emergency SOS')),
+      appBar: AppBar(title: Text('Emergency SOS'),leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),),
       body: Center(
         child: ElevatedButton(
           onPressed: () async {

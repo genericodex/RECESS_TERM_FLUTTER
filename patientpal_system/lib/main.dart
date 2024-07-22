@@ -33,11 +33,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),
+      home: LoginScreen(),
       routes: {
         '/registerDoctor': (context) => DoctorRegistrationPage(),
         '/home': (context) => HomePage(),
-        '/createAppointment': (context) => CreateAppointmentPage(),
+        '/createAppointment': (context) => BookingPage(),
       },
     );
   }
