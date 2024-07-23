@@ -8,7 +8,7 @@ import 'package:motion_tab_bar/MotionTabBarController.dart';
 import 'pages/appointments_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/notifications_page.dart';
-import 'pages/call_doctor_page.dart';
+// import 'pages/call_doctor_page.dart';
 import 'pages/make_appointment_page.dart';
 import 'pages/emergency_page.dart';
 import 'pages/feedback_page.dart';

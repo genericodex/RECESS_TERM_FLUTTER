@@ -109,7 +109,7 @@ class _CenterPageState extends State<CenterPage>
             
             SizedBox(height: 20),
             Text(
-              'KEEP CALM!\nAfter pressing SOS button we will have an ambulance at your location.',
+              '\nKEEP CALM!\nAfter pressing SOS button we will have an ambulance at your location.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey,

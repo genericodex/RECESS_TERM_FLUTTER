@@ -1,10 +1,10 @@
-// location_screen.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:lottie/lottie.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as maps;
+import 'package:location/location.dart';
+import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart' as lottie;
 import 'package:url_launcher/url_launcher.dart';
-import 'geolocation_service.dart';
-import 'geofence_service.dart';
 
 class LocationScreen extends StatefulWidget {
   @override
@@ -12,33 +12,115 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  GoogleMapController? mapController;
-  //final GeolocationService _geolocationService = GeolocationService();
-  LatLng _currentLocation = LatLng(45.521563, -122.677433); // Default location
+  maps.GoogleMapController? _mapController;
+  LocationData? _currentLocation;
+  maps.LatLng _ambulanceLocation = maps.LatLng(0.327771, 32.570843); // Example ambulance location
+  List<maps.LatLng> _routeCoordinates = [];
+
+  final Location _location = Location();
 
   @override
   void initState() {
     super.initState();
-    //_getCurrentLocation();
+    _requestLocationPermission();
   }
 
-  // Future<void> _getCurrentLocation() async {
-  //   try {
-  //     //final position = await _geolocationService.getCurrentLocation();
-  //     setState(() {
-  //       _currentLocation = LatLng(position.latitude, position.longitude);
-  //     });
-      
-  //   } catch (e) {
-  //     print('Error getting location: $e');
-  //   }
-  // }
+  Future<void> _requestLocationPermission() async {
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-    mapController?.animateCamera(
-      CameraUpdate.newLatLng(_currentLocation),
-    );
+    _serviceEnabled = await _location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await _location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _permissionGranted = await _location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await _location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _currentLocation = await _location.getLocation();
+    _location.onLocationChanged.listen((LocationData locationData) {
+      setState(() {
+        _currentLocation = locationData;
+      });
+      if (_mapController != null) {
+        _mapController!.animateCamera(maps.CameraUpdate.newCameraPosition(
+          maps.CameraPosition(
+            target: maps.LatLng(locationData.latitude!, locationData.longitude!),
+            zoom: 14.0,
+          ),
+        ));
+      }
+      _getRoute();
+    });
+  }
+
+  void _onMapCreated(maps.GoogleMapController controller) {
+    _mapController = controller;
+    if (_currentLocation != null) {
+      _mapController!.animateCamera(maps.CameraUpdate.newCameraPosition(
+        maps.CameraPosition(
+          target: maps.LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+          zoom: 34.0,
+        ),
+      ));
+      _getRoute();
+    }
+  }
+
+  Future<void> _getRoute() async {
+    if (_currentLocation == null) return;
+    final String url =
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${_currentLocation!.latitude},${_currentLocation!.longitude}&destination=${_ambulanceLocation.latitude},${_ambulanceLocation.longitude}&key=AIzaSyDp_mN2CoC8yrUrURxsGMP7qA0zKclTwzI';
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<maps.LatLng> points = _decodePolyline(data['routes'][0]['overview_polyline']['points']);
+      setState(() {
+        _routeCoordinates = points;
+      });
+    } else {
+      print('Failed to fetch route');
+    }
+  }
+
+  List<maps.LatLng> _decodePolyline(String poly) {
+    var list = poly.codeUnits;
+    var lList = [];
+    int index = 0;
+    int len = poly.length;
+    int c = 0;
+    do {
+      var shift = 0;
+      int result = 0;
+      do {
+        c = list[index] - 63;
+        result |= (c & 0x1F) << (shift * 5);
+        index++;
+        shift++;
+      } while (c >= 32);
+      if (result & 1 == 1) {
+        result = ~result;
+      }
+      var result1 = (result >> 1) * 0.00001;
+      lList.add(result1);
+    } while (index < len);
+    for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
+    List<maps.LatLng> polyline = [];
+    for (var i = 0; i < lList.length; i += 2) {
+      if (lList[i + 1] != null) {
+        polyline.add(maps.LatLng(lList[i], lList[i + 1]));
+      }
+    }
+    return polyline;
   }
 
   @override
@@ -49,13 +131,35 @@ class _LocationScreenState extends State<LocationScreen> {
       ),
       body: Stack(
         children: <Widget>[
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: _currentLocation,
-              zoom: 11.0,
-            ),
-          ),
+          _currentLocation == null
+              ? Center(child: CircularProgressIndicator())
+              : maps.GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: maps.CameraPosition(
+                    target: maps.LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                    zoom: 14.0,
+                  ),
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  markers: {
+                    // maps.Marker(
+                    //   markerId: maps.MarkerId('currentLocation'),
+                    //   position: maps.LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                    // ),
+                    maps.Marker(
+                      markerId: maps.MarkerId('ambulanceLocation'),
+                      position: _ambulanceLocation,
+                    ),
+                  },
+                  polylines: {
+                    maps.Polyline(
+                      polylineId: maps.PolylineId('route'),
+                      points: _routeCoordinates,
+                      color: Colors.blue,
+                      width: 5,
+                    ),
+                  },
+                ),
           Positioned(
             bottom: 20.0,
             left: 20.0,
@@ -78,8 +182,8 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Center(
-                    child: Lottie.asset(
-                      'assets/images/Animation - 1721588845402.json', // Replace with the path to your animated ambulance icon
+                    child: lottie.Lottie.asset(
+                      'assets/images/Animation - 1721588845402.json',
                       width: 100,
                       height: 100,
                     ),
@@ -100,15 +204,13 @@ class _LocationScreenState extends State<LocationScreen> {
                           if (await canLaunchUrl(url)) {
                             await launchUrl(url);
                           } else {
-                            print('Cannot launch url');
+                            print('cannot launch url');
                           }
                         },
-                        child: Text(
-                          'CALL AMBULANCE',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: Text('CALL AMBULANCE',
+                            style: TextStyle(
+                              color: Colors.white,
+                            )),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                         ),
