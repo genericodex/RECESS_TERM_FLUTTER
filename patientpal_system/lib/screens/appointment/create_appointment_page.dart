@@ -64,7 +64,7 @@ class _BookingPageState extends State<BookingPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12), // Rounded corners
                 ),
-                elevation: 5, // Shadow
+                elevation: 0, // Shadow
                 shadowColor: Colors.black.withOpacity(0.3), // Shadow color
               ).copyWith(
                 backgroundColor: WidgetStateProperty.resolveWith<Color>(
@@ -97,7 +97,7 @@ class _BookingPageState extends State<BookingPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12), // Rounded corners
                 ),
-                elevation: 5, // Shadow
+                elevation: 0, // Shadow
                 shadowColor: Colors.black.withOpacity(0.3), // Shadow color
               ).copyWith(
                 backgroundColor: WidgetStateProperty.resolveWith<Color>(
@@ -124,7 +124,7 @@ class _BookingPageState extends State<BookingPage> {
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   decoration: BoxDecoration(
                     color: null,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     ailment,
@@ -149,7 +149,7 @@ class _BookingPageState extends State<BookingPage> {
               fontSize: 16,
             ),
             underline: Container(
-              height: 1.5,
+              height: 1,
               color: const Color.fromARGB(255, 0, 150, 80), // Underline color
             ),
             isExpanded: true, // Makes the dropdown button full width
