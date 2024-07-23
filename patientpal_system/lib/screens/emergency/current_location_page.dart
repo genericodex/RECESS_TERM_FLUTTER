@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as maps;
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart' as lottie;
+import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -16,8 +17,11 @@ class _LocationScreenState extends State<LocationScreen> {
   LocationData? _currentLocation;
   maps.LatLng _ambulanceLocation = maps.LatLng(0.327771, 32.570843); // Example ambulance location
   List<maps.LatLng> _routeCoordinates = [];
+  final bool _cameraNeedsUpdate = true;
 
   final Location _location = Location();
+  maps.LatLng? _lastCameraPosition;
+  bool _userMovedMap = false;
 
   @override
   void initState() {
@@ -47,31 +51,37 @@ class _LocationScreenState extends State<LocationScreen> {
 
     _currentLocation = await _location.getLocation();
     _location.onLocationChanged.listen((LocationData locationData) {
-      setState(() {
-        _currentLocation = locationData;
-      });
-      if (_mapController != null) {
-        _mapController!.animateCamera(maps.CameraUpdate.newCameraPosition(
-          maps.CameraPosition(
-            target: maps.LatLng(locationData.latitude!, locationData.longitude!),
-            zoom: 14.0,
-          ),
-        ));
-      }
-      _getRoute();
-    });
+  if (_mapController != null && !_userMovedMap) {
+    if (_lastCameraPosition == null || _distanceBetween(_lastCameraPosition!, maps.LatLng(locationData.latitude!, locationData.longitude!)) > 0.01) {
+      _mapController!.animateCamera(maps.CameraUpdate.newCameraPosition(
+        maps.CameraPosition(
+          target: maps.LatLng(locationData.latitude!, locationData.longitude!),
+          zoom: 14.0,
+        ),
+      ));
+      _lastCameraPosition = maps.LatLng(locationData.latitude!, locationData.longitude!);
+    }
+  }
+  setState(() {
+    _currentLocation = locationData;
+  });
+  _getRoute();
+});
+
   }
 
   void _onMapCreated(maps.GoogleMapController controller) {
     _mapController = controller;
+    
     if (_currentLocation != null) {
       _mapController!.animateCamera(maps.CameraUpdate.newCameraPosition(
         maps.CameraPosition(
           target: maps.LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-          zoom: 34.0,
+          zoom: 0.0,
         ),
       ));
       _getRoute();
+      
     }
   }
 
@@ -123,6 +133,14 @@ class _LocationScreenState extends State<LocationScreen> {
     return polyline;
   }
 
+double _distanceBetween(maps.LatLng start, maps.LatLng end) {
+    const double p = 0.017453292519943295; // Math.PI / 180
+    final double a = 0.5 - cos((end.latitude - start.latitude) * p) / 2 +
+        cos(start.latitude * p) * cos(end.latitude * p) *
+            (1 - cos((end.longitude - start.longitude) * p)) / 2;
+    return 12742 * asin(sqrt(a)); // 2 * R; R = 6371 km
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,7 +155,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   onMapCreated: _onMapCreated,
                   initialCameraPosition: maps.CameraPosition(
                     target: maps.LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                    zoom: 14.0,
+                    zoom: 0.0,
                   ),
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
@@ -158,6 +176,12 @@ class _LocationScreenState extends State<LocationScreen> {
                       color: Colors.blue,
                       width: 5,
                     ),
+                  },
+                  onCameraMove: (_) {
+                    _userMovedMap = true;
+                  },
+                  onCameraIdle: () {
+                    _userMovedMap = false;
                   },
                 ),
           Positioned(

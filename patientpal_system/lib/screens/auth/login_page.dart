@@ -26,7 +26,8 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlutterLogin(
-      title: 'PATIENTPAL LOGIN',
+      title: 'LOGIN',
+      logo: AssetImage('assets/icons/app_icon.png'),
       onLogin: (loginData) => _authenticateUser(context, loginData),
       onSignup: (signupData) => _signupUser(context, signupData),
       onSubmitAnimationCompleted: () {

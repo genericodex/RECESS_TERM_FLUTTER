@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:patientpal_system/screens/appointment/create_appointment_page.dart';
+import 'package:patientpal_system/screens/emergency/emergency_location_page.dart';
 import 'package:provider/provider.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
@@ -38,13 +39,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.read<AuthProvider>();
-    final userEmail = authProvider.userEmail ?? 'User';
+    final userEmail = authProvider.userEmail ?? 'Guest';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'PatientPal',
-          style: TextStyle(fontWeight: FontWeight.bold),),
+        title: Image.asset(
+        'assets/icons/app_icon2.png', // Path to your image asset
+        height: 30, // Adjust the height as needed
+        color: Color.fromARGB(255, 24, 176, 123),
+        colorBlendMode: BlendMode.difference,
+      ),
         centerTitle: true,
         backgroundColor: Color.fromARGB(255, 24, 176, 123),
         actions: [
@@ -129,6 +133,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         'Welcome to \nPatientPal',
                         style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 1, 65, 12)),
                       ),
+                      // SizedBox(height: 1),
+                      // Image.asset(
+                      //     'assets/icons/app_icon2.png',
+                      //     width: 150, // Adjust the width as needed
+                      //     height: 220, // Adjust the height as needed // Adjust the fit as needed
+                      //   ),
                     ],
                   ),
                 ),
@@ -149,7 +159,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               mainAxisSpacing: 16,
               children: [
                 _buildGridItem(LineIcons.calendar, 'Make Appointment', context, BookingPage(), color: Color.fromARGB(255, 38, 163, 143)),
-                _buildGridItem(LineIcons.ambulance, 'Emergency', context, EmergencyPage(), color: Color.fromARGB(255, 209, 23, 23)),
+                _buildGridItem(LineIcons.ambulance, 'Emergency', context, CenterPage(), color: Color.fromARGB(255, 209, 23, 23)),
                 _buildGridItem(LineIcons.doctor, 'My Appointments', context, AppointmentsPage(), color: Color.fromARGB(255, 38, 163, 143)),
               ],
             ),
