@@ -1,12 +1,10 @@
+// location_screen.dart
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'call_ambulance_page.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart';
-
-//import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-
-
+import 'package:url_launcher/url_launcher.dart';
+import 'geolocation_service.dart';
+import 'geofence_service.dart';
 
 class LocationScreen extends StatefulWidget {
   @override
@@ -15,11 +13,32 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   GoogleMapController? mapController;
+  //final GeolocationService _geolocationService = GeolocationService();
+  LatLng _currentLocation = LatLng(45.521563, -122.677433); // Default location
 
-  final LatLng _center = const LatLng(45.521563, -122.677433);
+  @override
+  void initState() {
+    super.initState();
+    //_getCurrentLocation();
+  }
+
+  // Future<void> _getCurrentLocation() async {
+  //   try {
+  //     //final position = await _geolocationService.getCurrentLocation();
+  //     setState(() {
+  //       _currentLocation = LatLng(position.latitude, position.longitude);
+  //     });
+      
+  //   } catch (e) {
+  //     print('Error getting location: $e');
+  //   }
+  // }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    mapController?.animateCamera(
+      CameraUpdate.newLatLng(_currentLocation),
+    );
   }
 
   @override
@@ -33,7 +52,7 @@ class _LocationScreenState extends State<LocationScreen> {
           GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(
-              target: _center,
+              target: _currentLocation,
               zoom: 11.0,
             ),
           ),
@@ -65,7 +84,6 @@ class _LocationScreenState extends State<LocationScreen> {
                       height: 100,
                     ),
                   ),
-   
                   SizedBox(height: 10),
                   Row(
                     children: [
@@ -75,21 +93,22 @@ class _LocationScreenState extends State<LocationScreen> {
                       Spacer(),
                       ElevatedButton(
                         onPressed: () async {
-                
                           final Uri url = Uri(
-                          scheme: 'tel',
-                          path: "+256 780 204837",                   
+                            scheme: 'tel',
+                            path: "+256 780 204837",
                           );
-                          if (await canLaunchUrl(url)){
-                             await launchUrl(url);
-                          }else {
-                          print('cannot launch url');
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url);
+                          } else {
+                            print('Cannot launch url');
                           }
                         },
-                        child: Text('CALL AMBULANCE',
-                        style: TextStyle(
-                          color: Colors.white,
-                        )),
+                        child: Text(
+                          'CALL AMBULANCE',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                         ),

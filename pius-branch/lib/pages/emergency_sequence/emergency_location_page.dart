@@ -11,6 +11,7 @@ class _CenterPageState extends State<CenterPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  
 
   @override
   void initState() {
@@ -33,12 +34,18 @@ class _CenterPageState extends State<CenterPage>
     super.dispose();
   }
 
-  void _onSOSPressed() {
+  void _onSOSPressed() async {
+    // Get current location and set up geofence
+    try {
+      
     // Implement the SOS button functionality here
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => LocationScreen()),
     );
+    }catch (e) {
+      print('Error getting location or setting up geofence: $e');
+    }
   }
 
   @override
@@ -60,8 +67,8 @@ class _CenterPageState extends State<CenterPage>
                   );
                 },
                 child: Container(
-                  width: 200,
-                  height: 200,
+                  width: 250,
+                  height: 250,
                   decoration: BoxDecoration(
                     color: Colors.pink,
                     shape: BoxShape.circle,
@@ -81,7 +88,7 @@ class _CenterPageState extends State<CenterPage>
                           'SOS',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 40,
+                            fontSize: 50,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
