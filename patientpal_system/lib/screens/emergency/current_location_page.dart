@@ -17,7 +17,7 @@ class _LocationScreenState extends State<LocationScreen> {
   LocationData? _currentLocation;
   maps.LatLng _ambulanceLocation = maps.LatLng(0.327771, 32.570843); // Example ambulance location
   List<maps.LatLng> _routeCoordinates = [];
-  final bool _cameraNeedsUpdate = true;
+  // final bool _cameraNeedsUpdate = true;
 
   final Location _location = Location();
   maps.LatLng? _lastCameraPosition;
