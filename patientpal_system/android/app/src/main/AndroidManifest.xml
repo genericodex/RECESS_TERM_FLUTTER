@@ -1,9 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-<uses-permission android:name="android.permission.INTERNET"/>
+    
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
         android:label="patientpal_system"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/iconlogo">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+                   android:value="AIzaSyDp_mN2CoC8yrUrURxsGMP7qA0zKclTwzI"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
