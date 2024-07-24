@@ -7,8 +7,6 @@ class AuthProvider extends ChangeNotifier {
 
   User? get user => _user;
 
-  String? get userEmail => _user?.email;
-
   Future<void> login(String email, String password) async {
     try {
       final userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);

@@ -93,28 +93,3 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
-
-Future<String?> _authenticateUser(BuildContext context, LoginData data) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    try {
-      await authProvider.login(data.name, data.password);
-      return null;
-    } catch (e) {
-      return 'Login failed: ${e.toString()}';
-    }
-  }
-
-  Future<String?> _signupUser(BuildContext context, SignupData data) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    try {
-      await authProvider.register(data.name!, data.password!);
-      return null;
-    } catch (e) {
-      return 'Registration failed: ${e.toString()}';
-    }
-  }
-
-  Future<String?> _recoverPassword(String name) async {
-    // Implement your password recovery logic here
-    return null;
-  }

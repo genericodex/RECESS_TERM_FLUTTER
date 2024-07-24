@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:ionicons/ionicons.dart';
+import 'package:lottie/lottie.dart';
 import 'login_package.dart'; 
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
@@ -82,7 +85,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   static final List<Widget> _widgetOptions = <Widget>[
     AppointmentsPage(),
     HomePage(),
-    ProfilePage(),
     NotificationsPage(), // Add NotificationsPage for the fourth tab
   ];
 
@@ -111,16 +113,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           style: TextStyle(color: Color.fromARGB(255, 233, 240, 239)),
         ),
         centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 24, 176, 123),
+        backgroundColor: Color.fromARGB(255, 38, 163, 143),
       ),
-      drawer: Drawer(),
+
       bottomNavigationBar: MotionTabBar(
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
         useSafeArea: true,
-        labels: const ["Appointments", "Home", "Notifications"],
+        labels: const ["Appointments", "Home", "My Account"],
         icons: const [
-          LineIcons.calendar,
+          Ionicons.person_outline,
           LineIcons.home,
           LineIcons.bell,
         ],
@@ -156,94 +158,115 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 243, 237),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              color: Color.fromARGB(255, 120, 231, 178),
-              padding: EdgeInsets.all(16.0),
-              height: 280,
-              width: double.infinity,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Hello,\nPius Ssozi.',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Welcome to \nStudentCARE',
-                          style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 209, 23, 23)),
-                        ),
-                      ],
+      body: Column(
+        children: [
+          // Container inside AppBar area
+          Stack(
+            children: [
+              Container(
+                color: Color.fromARGB(255, 38, 163, 143),
+                padding: EdgeInsets.all(16.0),
+                height: 280,
+                width: double.infinity,
+                
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 32), // Space to avoid overlap with status bar
+                          Text(
+                            'Hello,\nPius Ssozi.',
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'Welcome to \nStudentCARE',
+                            style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 209, 23, 23)),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Image.asset(
-                    'assets/images/doctor.jpg',
-                    width: 150, // adjust the width as needed
-                    height: 220, // adjust the height as needed
-                    fit: BoxFit.cover, // adjust the fit as needed
-                  ),
-                ],
+                    Image.asset(
+                      'assets/images/doctor.jpg',
+                      width: 150, // adjust the width as needed
+                      height: 220, // adjust the height as needed
+                      fit: BoxFit.cover, // adjust the fit as needed
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            Expanded(
+            ],
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
               child: GridView.count(
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 children: [
-                  _buildGridItem(LineIcons.medicalClinic, 'Make Appointment', context, MakeAppointmentPage(), color: Color.fromARGB(255, 38, 163, 143)),
-                  _buildGridItem(LineIcons.ambulance, 'Emergency', context, EmergencyPage(), color: Color.fromARGB(255, 209, 23, 23)),
-                  _buildGridItem(LineIcons.envelope, 'Feedback', context, FeedbackPage(), color: Color.fromARGB(255, 38, 163, 143)),
+                  _buildGridItem('assets/images/stethoscope_2749779.png', 'Make Appointment', context, MakeAppointmentPage()),
+                  _buildGridItem('assets/images/ambulance_12618121.png', 'Emergency', context, EmergencyPage(), color: Color.fromARGB(255, 220, 3, 3)),
+                  _buildGridItem('assets/images/icons8-schedule-50.png', 'Appointments Schedule', context, FeedbackPage()),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-Widget _buildGridItem(IconData icon, String title, BuildContext context, Widget page, {Color color = Colors.black}) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+
+Widget _buildGridItem(String assetPath, String title, BuildContext context, Widget page, {Color color = const Color.fromARGB(255, 8, 45, 39)}) {
+    return Container(
+      decoration: BoxDecoration(
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2), // Shadow color
+          spreadRadius: 2, // Spread radius
+          blurRadius: 4, // Blur radius
+          offset: Offset(0, 4), // Offset in x and y directions
         ),
-      ),
-      onPressed: () {
-        if (title == 'Emergency') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CenterPage()),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          );
-        }
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 48, color: color),
-          SizedBox(height: 8),
-          Text(
-            title,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 20, 102, 89)),
+      ],
+      borderRadius: BorderRadius.circular(12),
+    ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
+        ),
+        onPressed: () {
+          if (title == 'Emergency') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CenterPage()),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => page),
+            );
+          }
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            assetPath.endsWith('.json')
+               ?Lottie.asset(assetPath, width: 48, height: 48)
+               :Image.asset(assetPath, width: 52, height: 52),
+            SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color),
+            ),
+          ],
+        ),
       ),
     );
   }
