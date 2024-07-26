@@ -1,5 +1,9 @@
+import 'package:background_sms/background_sms.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'current_location_page.dart';
+
 
 
 class CenterPage extends StatefulWidget {
@@ -33,13 +37,54 @@ class _CenterPageState extends State<CenterPage>
     super.dispose();
   }
 
-  void _onSOSPressed() {
+  Future<void> _onSOSPressed() async {
+    if (await Permission.sms.isGranted) {
+      smsFunction(message: 'This is an emergency! Please send help to my location.', number: '+256 705 642691');
+    } else {
+      final status = await Permission.sms.request();
+      if (status.isGranted) {
+        smsFunction(message: 'This is an emergency! Please send help to my location.', number: '+256 705 642691');
+      }
+    }
+    // Send the SMS
+    //sendSMS('+256 702 613426', 'This is an emergency! Please send help to my location.');
     // Implement the SOS button functionality here
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => LocationScreen()),
     );
+
+    
   }
+
+  Future<void> smsFunction({required String message, required String number}) async {
+    SmsStatus res = await BackgroundSms.sendMessage(
+      phoneNumber: number,
+      message: message,
+    );
+    // Handle SMS status if needed
+    if (res == SmsStatus.sent) {
+      print("SMS sent successfully");
+    } else {
+      print("Failed to send SMS");
+    }
+  }
+
+  //void sendSMS(String phoneNumber, String message) async {
+    //final Uri uri = Uri(
+      //scheme: 'sms',
+      //path: phoneNumber,
+      //queryParameters: <String, String>{
+        //'body': message,
+      //},
+    //);
+
+    //if (await canLaunchUrl(uri.toString() as Uri)) {
+      //await launchUrl(uri.toString() as Uri);
+    //} else {
+      //throw 'Could not launch $uri';
+    //}
+  //}
 
   @override
   Widget build(BuildContext context) {
@@ -60,14 +105,14 @@ class _CenterPageState extends State<CenterPage>
                   );
                 },
                 child: Container(
-                  width: 200,
-                  height: 200,
+                  width: 250,
+                  height: 250,
                   decoration: BoxDecoration(
-                    color: Colors.pink,
+                    color: Color.fromARGB(255, 200, 14, 14),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.pinkAccent.withOpacity(0.6),
+                        color: Colors.redAccent.withOpacity(0.6),
                         spreadRadius: 10,
                         blurRadius: 15,
                       ),
@@ -81,7 +126,7 @@ class _CenterPageState extends State<CenterPage>
                           'SOS',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 40,
+                            fontSize: 60,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

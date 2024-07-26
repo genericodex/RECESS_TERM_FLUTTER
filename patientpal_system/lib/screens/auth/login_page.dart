@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_login/flutter_login.dart';
@@ -117,4 +118,4 @@ Future<String?> _authenticateUser(BuildContext context, LoginData data) async {
   Future<String?> _recoverPassword(String name) async {
     // Implement your password recovery logic here
     return null;
-  }
+  } 
