@@ -14,6 +14,7 @@ import 'package:patientpal_system/screens/auth/login_page.dart';
 // import 'package:patientpal_system/screens/feedback/feedback_page.dart';
 import 'package:patientpal_system/screens/emergency/emergency_page.dart';
 // import 'package:patientpal_system/screens/make_appointment/make_appointment_page.dart';
+import 'custom_clipper.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -85,57 +86,63 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     );
   }
+
 Widget _buildHomeContent(String userEmail) {
   return Scaffold(
     backgroundColor: Colors.grey[200],  // Change this to your desired background color
     body: Column(
       children: [
-        Container(
-          height: 370,  // Adjust the height as needed
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20.0),
-              bottomRight: Radius.circular(20.0),
+        ClipPath(
+          clipper: BottomCurvedClipper(),
+          child: Container(
+            height: 370,  // Adjust the height as needed
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20.0),
+                bottomRight: Radius.circular(20.0),
+              ),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.fromARGB(255, 128, 235, 215),
+                  Color.fromARGB(255, 57, 156, 138),
+                ],
+              ),
             ),
-            gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 64, 165, 147),
-                Color.fromARGB(255, 64, 165, 147),
+            padding: EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 16),
+                      Text(
+                        'Welcome to',
+                        style: TextStyle(
+                          fontSize: 28,
+                          color: Color.fromARGB(255, 244, 247, 245),
+                        ),
+                      ),
+                      Image.asset(
+                        'assets/icons/app_icon2.png',
+                        height: 32,
+                        color: Color.fromARGB(255, 38, 163, 143),
+                        colorBlendMode: BlendMode.difference,
+                      ),
+                    ],
+                  ),
+                ),
+                Image.asset(
+                  'assets/images/vecteezy_realistic-medical-stethoscope-on-transparent-background_16774611.png',
+                  width: 140,
+                  height: 220,
+                  fit: BoxFit.cover,
+                ),
               ],
             ),
-          ),
-          padding: EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 16),
-                    Text(
-                      'Welcome to',
-                      style: TextStyle(
-                        fontSize: 28,
-                        color: Color.fromARGB(255, 244, 247, 245),
-                      ),
-                    ),
-                    Image.asset(
-                      'assets/icons/app_icon2.png',
-                      height: 32,
-                      color: Color.fromARGB(255, 38, 163, 143),
-                      colorBlendMode: BlendMode.difference,
-                    ),
-                  ],
-                ),
-              ),
-              Image.asset(
-                'assets/images/vecteezy_realistic-medical-stethoscope-on-transparent-background_16774611.png',
-                width: 140,
-                height: 220,
-                fit: BoxFit.cover,
-              ),
-            ],
           ),
         ),
         //SizedBox(height: 0),
