@@ -159,153 +159,170 @@ class _BookingPageState extends State<BookingPage> {
         backgroundColor: Color.fromARGB(255, 24, 176, 123),
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Select Ailment Type', style: GoogleFonts.poppins(
-              textStyle: TextStyle(
-                color: Colors.black, 
-                letterSpacing: .5,
-                fontSize: 20,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Select Ailment Type', style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                  color: Colors.black, 
+                  letterSpacing: .5,
+                  fontSize: 20,
+                  )
                 )
-              )
-            ),
-            SizedBox(height: 8),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.15,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: _ailments.map((ailment) {
-                  return _buildCard(ailment, () async {
-                    setState(() {
-                      _selectedAilment = ailment;
-                    });
-                    await _fetchDoctorWorkDays(ailment);
-                  },
-                  _selectedAilment == ailment,
-                  );
-                }).toList(),
               ),
-            ),
-            SizedBox(height: 16),
-            _workDays.isEmpty
-                ? Center(child: Text('Please select an ailment.', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.black, letterSpacing: .5)),),)
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Select Work Day', style: GoogleFonts.poppins(
-              textStyle: TextStyle(
-                color: Colors.black, 
-                letterSpacing: .5,
-                fontSize: 20,
-                )
-              )),
-                      SizedBox(height: 8),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.15,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: _workDays.map((day) {
-                            return _buildCard(day, () async {
-                              setState(() {
-                                _selectedWorkDay = day;
-                              });
-                              await _fetchAvailableTimeSlots(day);
-                            },
-                            _selectedWorkDay == day,
-                            );
-                          }).toList(),
+              SizedBox(height: 8),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.15,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: _ailments.map((ailment) {
+                    return _buildCard(ailment, () async {
+                      setState(() {
+                        _selectedAilment = ailment;
+                      });
+                      await _fetchDoctorWorkDays(ailment);
+                    },
+                    _selectedAilment == ailment,
+                    );
+                  }).toList(),
+                ),
+              ),
+              SizedBox(height: 16),
+              Divider(
+                color: Colors.grey[400], // Change this to your preferred color
+                thickness: 0.5,
+              ),
+              SizedBox(height: 16),
+              _workDays.isEmpty
+                  ? Center(child: Text('Please select an ailment.', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.black, letterSpacing: .5)),),)
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Select Work Day', style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                  color: Colors.black, 
+                  letterSpacing: .5,
+                  fontSize: 20,
+                  )
+                )),
+                        SizedBox(height: 8),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.15,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: _workDays.map((day) {
+                              return _buildCard(day, () async {
+                                setState(() {
+                                  _selectedWorkDay = day;
+                                });
+                                await _fetchAvailableTimeSlots(day);
+                              },
+                              _selectedWorkDay == day,
+                              );
+                            }).toList(),
+                          ),
                         ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+              Divider(
+                color: Colors.grey[400], // Change this to your preferred color
+                thickness: 0.5,
+              ),
+              SizedBox(height: 16),
+              Text('Select Time', style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                  color: Colors.black, 
+                  letterSpacing: .5,
+                  fontSize: 20,
+                  )
+                )),
+              // Displaying available time slots in a horizontal row
+        _availableTimeSlots.isEmpty
+            ? Center(child: Text('Please select a work day.', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.black, letterSpacing: .5)),),)
+            : SizedBox(
+          height: MediaQuery.of(context).size.height * 0.1,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: _availableTimeSlots.map((slot) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedTimeSlot = slot['time'];
+                    });
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+            color: _selectedTimeSlot == slot['time'] ? Color.fromARGB(255, 30, 181, 108) : Color.fromARGB(255, 229, 228, 228), // Border color
+            width: 2.0, // Border width
+          ),
+                      color: _selectedTimeSlot == slot['time']
+                          ? Color.fromARGB(255, 170, 253, 196)
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${slot['time']}',
+                                  style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                  color: _selectedTimeSlot == slot['time'] 
+                                    ? Color.fromARGB(255, 0, 45, 6)
+                                    : Color.fromARGB(255, 0, 175, 62),
+                  letterSpacing: .5,
+                  fontSize: 20,
+                  )
+                )
+                                ),
                       ),
-                    ],
-                  ),
-            SizedBox(height: 16),
-            Text('Select Time', style: GoogleFonts.poppins(
-              textStyle: TextStyle(
-                color: Colors.black, 
-                letterSpacing: .5,
-                fontSize: 20,
-                )
-              )),
-            // Displaying available time slots in a horizontal row
-_availableTimeSlots.isEmpty
-    ? Center(child: Text('Please select a work day.', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.black, letterSpacing: .5)),),)
-    : SizedBox(
-        height: MediaQuery.of(context).size.height * 0.1,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: _availableTimeSlots.map((slot) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedTimeSlot = slot['time'];
-                  });
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-          color: _selectedTimeSlot == slot['time'] ? Color.fromARGB(255, 30, 181, 108) : Color.fromARGB(255, 229, 228, 228), // Border color
-          width: 2.0, // Border width
-        ),
-                    color: _selectedTimeSlot == slot['time']
-                        ? Color.fromARGB(255, 170, 253, 196)
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('${slot['time']}',
-                                style: GoogleFonts.poppins(
-              textStyle: TextStyle(
-                color: _selectedTimeSlot == slot['time'] 
-                                  ? Color.fromARGB(255, 0, 45, 6)
-                                  : Color.fromARGB(255, 0, 175, 62),
-                letterSpacing: .5,
-                fontSize: 20,
-                )
-              )
-                              ),
                     ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
-      ),
-
-            SizedBox(height: 44),
-            Center(
-              child: ElevatedButton(
-                onPressed: _bookAppointment,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 0, 150, 80), // Background color
-                  foregroundColor: Colors.white, // Text color
-                  elevation: 3.0, // Shadow elevation
-                  padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0), // Button padding
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0), // Rounded corners
-                    side: BorderSide(color: const Color.fromARGB(255, 100, 255, 131), width: 2.0), // Border color and width
-                  ),
-                  textStyle: TextStyle(
-                    fontSize: 16.0, // Text size
-                    fontWeight: FontWeight.bold, // Text weight
-                    color: Colors.white, // Ensure consistent text color
-                    inherit: true, // Ensure inherit is true for consistency
-                  ),
-                ),
-                child: Text('Book Appointment'),
+        SizedBox(height: 16),
+              Divider(
+                color: Colors.grey[400], // Change this to your preferred color
+                thickness: 0.5,
               ),
-            )
-
-
-          ],
+        
+              SizedBox(height: 44),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _bookAppointment,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 0, 150, 80), // Background color
+                    foregroundColor: Colors.white, // Text color
+                    elevation: 3.0, // Shadow elevation
+                    padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0), // Button padding
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0), // Rounded corners
+                      side: BorderSide(color: const Color.fromARGB(255, 100, 255, 131), width: 2.0), // Border color and width
+                    ),
+                    textStyle: TextStyle(
+                      fontSize: 16.0, // Text size
+                      fontWeight: FontWeight.bold, // Text weight
+                      color: Colors.white, // Ensure consistent text color
+                      inherit: true, // Ensure inherit is true for consistency
+                    ),
+                  ),
+                  child: Text('Book Appointment'),
+                ),
+              )
+        
+        
+            ],
+          ),
         ),
       ),
     );
