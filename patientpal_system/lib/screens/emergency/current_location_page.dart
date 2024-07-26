@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as maps;
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
@@ -145,7 +146,11 @@ double _distanceBetween(maps.LatLng start, maps.LatLng end) {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Location'),
+        title: Text('Emergency Location',
+        style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5)),
+        ),
+        backgroundColor: Color.fromARGB(255, 176, 39, 24),
+        foregroundColor: Colors.white,
       ),
       body: Stack(
         children: <Widget>[

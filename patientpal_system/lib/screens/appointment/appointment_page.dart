@@ -1,21 +1,125 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
 import 'create_appointment_page.dart';
 
 class AppointmentsPage extends StatelessWidget {
+  Future<String> _fetchDoctorName(String doctorId) async {
+    try {
+      DocumentSnapshot docSnapshot = await FirebaseFirestore.instance.collection('doctors').doc(doctorId).get();
+      Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
+      return data?['name'] ?? 'Unknown Doctor';
+    } catch (e) {
+      print('Error fetching doctor name: $e');
+      return 'Unknown Doctor';
+    }
+  }
+
+  Future<Card> _buildAppointmentCard(Map<String, dynamic> data, String appointmentId, BuildContext context) async {
+    String? dateTime = data['timeSlot'] as String?;
+    String ailmentType = data['ailment'] as String;
+    bool status = data['isBooked'] as bool;
+    String doctorId = data['doctorId'] as String;
+
+    // Fetch doctor's name
+    String doctorName = await _fetchDoctorName(doctorId);
+
+    return Card(
+      elevation: 5,
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.all(16.0),
+        leading: Icon(
+          Icons.calendar_today,
+          color: Colors.teal,
+          size: 40,
+        ),
+        title: Text(
+          dateTime != null ? 'Appointment on ${dateTime}' : 'Appointment date not set',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8.0),
+            Text(
+              'Ailment: $ailmentType',
+              style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.teal, letterSpacing: .5,fontSize: 16)),
+            ),
+            SizedBox(height: 4.0),
+            Text(
+              'Doctor: $doctorName',
+              style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.teal, letterSpacing: .5,fontSize: 16)),
+            ),
+            SizedBox(height: 4.0),
+            Text(
+              status ? 'Status: Booked' : 'Status: Available',
+              style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.grey, letterSpacing: .5,fontSize: 16)),
+            ),
+          ],
+        ),
+        trailing: IconButton(
+          icon: Icon(Icons.cancel),
+          color: Colors.red,
+          onPressed: () async {
+            await _cancelAppointment(context, appointmentId);
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _cancelAppointment(BuildContext context, String appointmentId) async {
+    try {
+      await FirebaseFirestore.instance.collection('appointments').doc(appointmentId).delete();
+      await FirebaseFirestore.instance
+          .collection('time_slots')
+          .where('appointmentId', isEqualTo: appointmentId)
+          .get()
+          .then((snapshot) {
+        for (var doc in snapshot.docs) {
+          doc.reference.update({'isBooked': false});
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(
+        'Appointment canceled', 
+        style: GoogleFonts.poppins(
+        textStyle: TextStyle(
+        color: Colors.white, 
+        fontSize: 16, letterSpacing: .5
+        )
+        )),
+        backgroundColor: Colors.green,),
+      );
+    } catch (e) {
+      print('Error canceling appointment: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to cancel appointment')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Appointments', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        backgroundColor: Color.fromARGB(255, 24, 176, 123),
+        title: Text('My Appointments', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous screen
+            Navigator.pop(context);
           },
         ),
         actions: [
@@ -44,56 +148,28 @@ class AppointmentsPage extends StatelessWidget {
             return Center(child: Text('No appointments found', style: TextStyle(fontSize: 18, color: Colors.grey)));
           }
 
-          return ListView(
-            padding: EdgeInsets.all(16.0),
-            children: snapshot.data!.docs.map((doc) {
-              Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-              Timestamp dateTime = data['date_time'];
-              String ailmentType = data['ailment_type'];
-              String status = data['status'];
+          // Process the documents asynchronously
+          return FutureBuilder<List<Widget>>(
+            future: Future.wait(
+              snapshot.data!.docs.map((doc) async {
+                Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+                return await _buildAppointmentCard(data, doc.id, context);
+              }).toList(),
+            ),
+            builder: (context, futureSnapshot) {
+              if (futureSnapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
 
-              return Card(
-                elevation: 5,
-                margin: EdgeInsets.symmetric(vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(16.0),
-                  leading: Icon(
-                    Icons.calendar_today,
-                    color: Colors.teal,
-                    size: 40,
-                  ),
-                  title: Text(
-                    'Appointment on ${dateTime.toDate().toLocal()}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 8.0),
-                      Text(
-                        'Ailment: $ailmentType',
-                        style: TextStyle(fontSize: 16, color: Colors.teal),
-                      ),
-                      SizedBox(height: 4.0),
-                      Text(
-                        'Status: $status',
-                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                  trailing: Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.teal,
-                  ),
-                ),
+              if (futureSnapshot.hasError) {
+                return Center(child: Text('Error: ${futureSnapshot.error}'));
+              }
+
+              return ListView(
+                padding: EdgeInsets.all(16.0),
+                children: futureSnapshot.data ?? [],
               );
-            }).toList(),
+            },
           );
         },
       ),

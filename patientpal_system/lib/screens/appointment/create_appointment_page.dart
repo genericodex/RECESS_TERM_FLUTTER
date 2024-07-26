@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:patientpal_system/providers/appointment_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 class BookingPage extends StatefulWidget {
   @override
@@ -10,252 +11,303 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
   String? _selectedAilment;
+  String? _selectedTimeSlot;
+  String? _selectedDoctorId;
+  String? _selectedWorkDay;
 
-  final List<String> _ailmentOptions = [
-    'Optics',
-    'Dental',
-    'General',
-    'ENT',
-    // Add more ailment types as needed
-  ];
+  List<String> _ailments = ['Dental', 'Optics', 'General', 'ENT']; // Your ailment types
+  List<String> _workDays = [];
+  List<Map<String, dynamic>> _availableTimeSlots = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _fetchDoctorWorkDays(String ailment) async {
+    try {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      QuerySnapshot doctorSnapshot = await firestore
+          .collection('doctors')
+          .where('department', isEqualTo: ailment)
+          .get();
+
+      if (doctorSnapshot.docs.isNotEmpty) {
+        var doctor = doctorSnapshot.docs.first.data() as Map<String, dynamic>;
+        setState(() {
+          _selectedDoctorId = doctorSnapshot.docs.first.id;
+          _workDays = List<String>.from(doctor['working_days']);
+        });
+      }
+    } catch (e) {
+      print('Error fetching doctor workdays: $e');
+    }
+  }
+
+  Future<void> _fetchAvailableTimeSlots(String workDay) async {
+    try {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      QuerySnapshot snapshot = await firestore
+          .collection('time_slots')
+          .where('isBooked', isEqualTo: false)
+          .where('doctorId', isEqualTo: _selectedDoctorId)
+          .where('day', isEqualTo: workDay)
+          .get();
+
+      setState(() {
+        _availableTimeSlots = snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+      });
+    } catch (e) {
+      print('Error fetching available time slots: $e');
+    }
+  }
+
+  Future<void> _bookAppointment() async {
+    final user = context.read<AuthProvider>().user;
+
+    if (_selectedAilment != null && _selectedTimeSlot != null && _selectedWorkDay != null) {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      var appointment = {
+        'doctorId': _selectedDoctorId,
+        'patient_id': user!.uid,
+        'ailment': _selectedAilment,
+        'timeSlot': _selectedTimeSlot,
+        'workDay': _selectedWorkDay,
+        'isBooked': true,
+      };
+
+      await firestore.collection('appointments').add(appointment);
+      await firestore
+          .collection('time_slots')
+          .where('doctorId', isEqualTo: _selectedDoctorId)
+          .where('day', isEqualTo: _selectedWorkDay)
+          .where('time', isEqualTo: _selectedTimeSlot)
+          .get()
+          .then((snapshot) {
+        for (var doc in snapshot.docs) {
+          doc.reference.update({'isBooked': true});
+        }
+      });
+
+      setState(() {
+        _selectedAilment = null;
+        _selectedTimeSlot = null;
+        _selectedWorkDay = null;
+        _workDays = [];
+        _availableTimeSlots = [];
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Appointment booked successfully!'), backgroundColor: Colors.green,));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select all required fields.'),backgroundColor: Color.fromARGB(255, 255, 0, 0),));
+    }
+  }
+
+ Widget _buildCard(String day, VoidCallback onTap, bool isSelected) {
+  // bool isSelected = _selectedWorkDay == day;
+
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      width: MediaQuery.of(context).size.width * 0.4,
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: isSelected ? Color.fromARGB(255, 30, 181, 108) : Color.fromARGB(255, 229, 228, 228), // Border color
+          width: 2.0, // Border width
+        ),
+        color: isSelected ? Color.fromARGB(255, 170, 253, 196) : Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+        // boxShadow: [
+        //   if (isSelected)
+        //     BoxShadow(
+        //       color: Color.fromARGB(255, 1, 69, 39).withOpacity(0.5),
+        //       spreadRadius: 2,
+        //       blurRadius: 5,
+        //     ),
+        // ],
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            day,
+            style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                color: isSelected ? Color.fromARGB(255, 0, 45, 6) : Color.fromARGB(255, 0, 175, 62),
+                letterSpacing: .5,
+                fontSize: 20,
+                )
+              )
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 240, 240, 240),
       appBar: AppBar(
-        title: Text('Book an Appointment'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous screen
-          },
+        title: Text('Book an Appointment',
+        style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5)),
         ),
-        // backgroundColor: Colors.teal,
+        backgroundColor: Color.fromARGB(255, 24, 176, 123),
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Select Date and Time',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text('Select Ailment Type', style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                color: Colors.black, 
+                letterSpacing: .5,
+                fontSize: 20,
+                )
+              )
             ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => _selectDate(context),
-              child: Text(
-                _selectedDate == null
-                    ? 'Select Date'
-                    : 'Date: ${DateFormat.yMMMd().format(_selectedDate!)}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 7, 151, 57),
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.teal, // Text color
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12), // Rounded corners
-                ),
-                elevation: 0, // Shadow
-                shadowColor: Colors.black.withOpacity(0.3), // Shadow color
-              ).copyWith(
-                backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                  (Set<WidgetState> states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return Color.fromARGB(255, 0, 121, 65); // Darker color when pressed
-                    }
-                    return Color.fromARGB(255, 202, 251, 221); // Default color
+            SizedBox(height: 8),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.15,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: _ailments.map((ailment) {
+                  return _buildCard(ailment, () async {
+                    setState(() {
+                      _selectedAilment = ailment;
+                    });
+                    await _fetchDoctorWorkDays(ailment);
                   },
-                ),
+                  _selectedAilment == ailment,
+                  );
+                }).toList(),
               ),
             ),
             SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => _selectTime(context),
-              child: Text(
-                _selectedTime == null
-                    ? 'Select Time'
-                    : 'Time: ${_selectedTime!.format(context)}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 7, 151, 57),
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Color.fromARGB(255, 2, 145, 54),
-                backgroundColor: Color.fromARGB(255, 194, 255, 220), // Text color
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12), // Rounded corners
-                ),
-                elevation: 0, // Shadow
-                shadowColor: Colors.black.withOpacity(0.3), // Shadow color
-              ).copyWith(
-                backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                  (Set<WidgetState> states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return const Color.fromARGB(255, 0, 121, 65); // Darker color when pressed
-                    }
-                    return Color.fromARGB(255, 202, 251, 221); // Default color
-                  },
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            DropdownButton<String>(
-            value: _selectedAilment,
-            hint: Text(
-              'Select Ailment',
-              style: TextStyle(color: Colors.grey[600], fontSize: 16),
-            ),
-            items: _ailmentOptions.map((ailment) {
-              return DropdownMenuItem<String>(
-                value: ailment,
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: null,
-                    borderRadius: BorderRadius.circular(20),
+            _workDays.isEmpty
+                ? Center(child: Text('Please select an ailment.', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.black, letterSpacing: .5)),),)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Select Work Day', style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                color: Colors.black, 
+                letterSpacing: .5,
+                fontSize: 20,
+                )
+              )),
+                      SizedBox(height: 8),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.15,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: _workDays.map((day) {
+                            return _buildCard(day, () async {
+                              setState(() {
+                                _selectedWorkDay = day;
+                              });
+                              await _fetchAvailableTimeSlots(day);
+                            },
+                            _selectedWorkDay == day,
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    ailment,
-                    style: TextStyle(
-                      color: Colors.teal,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+            SizedBox(height: 16),
+            Text('Select Time', style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                color: Colors.black, 
+                letterSpacing: .5,
+                fontSize: 20,
+                )
+              )),
+            // Displaying available time slots in a horizontal row
+_availableTimeSlots.isEmpty
+    ? Center(child: Text('Please select a work day.', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.black, letterSpacing: .5)),),)
+    : SizedBox(
+        height: MediaQuery.of(context).size.height * 0.1,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: _availableTimeSlots.map((slot) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedTimeSlot = slot['time'];
+                  });
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+          color: _selectedTimeSlot == slot['time'] ? Color.fromARGB(255, 30, 181, 108) : Color.fromARGB(255, 229, 228, 228), // Border color
+          width: 2.0, // Border width
+        ),
+                    color: _selectedTimeSlot == slot['time']
+                        ? Color.fromARGB(255, 170, 253, 196)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${slot['time']}',
+                                style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                color: _selectedTimeSlot == slot['time'] 
+                                  ? Color.fromARGB(255, 0, 45, 6)
+                                  : Color.fromARGB(255, 0, 175, 62),
+                letterSpacing: .5,
+                fontSize: 20,
+                )
+              )
+                              ),
                     ),
                   ),
                 ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              setState(() {
-                _selectedAilment = newValue;
-              });
-            },
-            dropdownColor: const Color.fromARGB(255, 209, 231, 229), // Background color of the dropdown
-            iconEnabledColor: Colors.teal, // Color of the dropdown icon
-            style: TextStyle(
-              color: Colors.teal, // Color of the selected item text
-              fontSize: 16,
-            ),
-            underline: Container(
-              height: 1,
-              color: const Color.fromARGB(255, 0, 150, 80), // Underline color
-            ),
-            isExpanded: true, // Makes the dropdown button full width
-          ),
-            SizedBox(height: 24),
-            ElevatedButton(
-  onPressed: _bookAppointment,
-  child: Text(
-    'Book Now',
-    style: TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.bold,
-    ),
-  ),
-  style: ElevatedButton.styleFrom(
-    foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 0, 150, 77), // Text color
-    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12), // Rounded corners
-    ),
-    elevation: 5, // Shadow
-    shadowColor: Colors.black.withOpacity(0.3), // Shadow color
-  ).copyWith(
-    backgroundColor: WidgetStateProperty.resolveWith<Color>(
-      (Set<WidgetState> states) {
-        if (states.contains(WidgetState.pressed)) {
-          return const Color.fromARGB(255, 0, 121, 44); // Darker color when pressed
-        }
-        return const Color.fromARGB(255, 0, 150, 80); // Default color
-      },
-    ),
-  ),
-),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+
+            SizedBox(height: 44),
+            Center(
+              child: ElevatedButton(
+                onPressed: _bookAppointment,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 0, 150, 80), // Background color
+                  foregroundColor: Colors.white, // Text color
+                  elevation: 3.0, // Shadow elevation
+                  padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0), // Button padding
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0), // Rounded corners
+                    side: BorderSide(color: const Color.fromARGB(255, 100, 255, 131), width: 2.0), // Border color and width
+                  ),
+                  textStyle: TextStyle(
+                    fontSize: 16.0, // Text size
+                    fontWeight: FontWeight.bold, // Text weight
+                    color: Colors.white, // Ensure consistent text color
+                    inherit: true, // Ensure inherit is true for consistency
+                  ),
+                ),
+                child: Text('Book Appointment'),
+              ),
+            )
+
+
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (pickedDate != null && pickedDate != _selectedDate) {
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime ?? TimeOfDay.now(),
-    );
-    if (pickedTime != null && pickedTime != _selectedTime) {
-      setState(() {
-        _selectedTime = pickedTime;
-      });
-    }
-  }
-
-  void _bookAppointment() async {
-  final user = context.read<AuthProvider>().user;
-  if (user != null && _selectedDate != null && _selectedTime != null && _selectedAilment != null) {
-    try {
-      DateTime dateTime = DateTime(
-        _selectedDate!.year,
-        _selectedDate!.month,
-        _selectedDate!.day,
-        _selectedTime!.hour,
-        _selectedTime!.minute,
-      );
-      await context.read<AppointmentProvider>().createAppointment(
-        user.uid,
-        _selectedAilment!,
-        dateTime,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Appointment booked successfully'),
-        backgroundColor: Colors.green,
-      ));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to book appointment: $e'),
-        backgroundColor: Colors.red,
-      ));
-      print('Failed to book appointment: $e');
-    }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Please complete all fields'),
-      backgroundColor: Colors.red,
-    ));
-    print('Please complete all fields');
-  }
-}
-
-
-}
-
-extension DateTimeFormatting on DateTime {
-  String toShortDateString() {
-    return '${this.day}-${this.month}-${this.year}';
   }
 }

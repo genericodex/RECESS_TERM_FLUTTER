@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'current_location_page.dart';
-
 
 class CenterPage extends StatefulWidget {
   @override
   _CenterPageState createState() => _CenterPageState();
 }
 
-class _CenterPageState extends State<CenterPage>
-    with SingleTickerProviderStateMixin {
+class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -33,17 +35,77 @@ class _CenterPageState extends State<CenterPage>
     super.dispose();
   }
 
-  void _onSOSPressed() {
-    // Implement the SOS button functionality here
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LocationScreen()),
-    );
+  Future<void> _onSOSPressed() async {
+    try {
+      // Get user's location
+      Position position = await _determinePosition();
+
+      // Get current user
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        // Prepare emergency request data
+        Map<String, dynamic> emergencyData = {
+          'userId': user.uid,
+          'location': GeoPoint(position.latitude, position.longitude),
+          'timestamp': FieldValue.serverTimestamp(),
+        };
+
+        // Save emergency request to Firestore
+        await FirebaseFirestore.instance.collection('emergency_requests').add(emergencyData);
+
+        // Navigate to the location screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LocationScreen()),
+        );
+      } else {
+        // Handle the case when the user is not authenticated
+        print('User not authenticated');
+      }
+    } catch (e) {
+      print('Error on SOS press: $e');
+    }
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied.');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 143, 38, 68),
+        title: Text('SOS Emergency', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back,color: Colors.white,),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
@@ -99,10 +161,9 @@ class _CenterPageState extends State<CenterPage>
                 ),
               ),
             ),
-            
             SizedBox(height: 20),
             Text(
-              '\nKEEP CALM!\nAfter pressing SOS button we will have an ambulance at your location.',
+              '\nKEEP CALM!\nAfter pressing the SOS button, we will have an ambulance at your location.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey,
