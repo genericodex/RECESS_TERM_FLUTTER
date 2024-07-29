@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'current_location_page.dart';
+import 'package:location/location.dart';
 
 
 
@@ -15,6 +16,8 @@ class _CenterPageState extends State<CenterPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  Location location = new Location();
+  LocationData? _currentLocation;
 
   @override
   void initState() {
@@ -29,21 +32,49 @@ class _CenterPageState extends State<CenterPage>
         curve: Curves.easeInOut,
       ),
     );
+    _getCurrentLocation();
+  }
+
+  
+
+  void _getCurrentLocation() async {
+    LocationData _locationData = await location.getLocation();
+    setState(() {
+      _currentLocation = _locationData;
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+
   }
 
+ 
+
+  // final googleMapsLink =
+  //       'https://www.google.com/maps/dir/?api=1&origin=${_currentLocation!.latitude},${_currentLocation!.longitude}&travelmode=driving';
+
+
   Future<void> _onSOSPressed() async {
+    if (_currentLocation != null) {
+    } else {
+      
+      print("Location is not available.");
+    }
+
+    final googleMapsLink =
+        'https://www.google.com/maps/search/?api=1&query=${_currentLocation!.latitude},${_currentLocation!.longitude}';
+
+
+
     if (await Permission.sms.isGranted) {
-      smsFunction(message: 'This is an emergency! Please send help to my location.', number: '+256 705 642691');
+      smsFunction(message: 'Emergency reported! Please send help to the location: $googleMapsLink', number: '+256 705 642691');
     } else {
       final status = await Permission.sms.request();
       if (status.isGranted) {
-        smsFunction(message: 'This is an emergency! Please send help to my location.', number: '+256 705 642691');
+        smsFunction(message: 'Emergency reported! Please send help to the location: $googleMapsLink', number: '+256 705 642691');
       }
     }
     // Send the SMS

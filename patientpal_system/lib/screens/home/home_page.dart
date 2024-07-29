@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         useSafeArea: true,
         labels: const ["My Account", "Home", "Notifications"],
         icons: const [
-          Ionicons.person_outline,
+          FontAwesomeIcons.user,
           FontAwesomeIcons.house,
           FontAwesomeIcons.bell,
         ],
