@@ -3,6 +3,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:label="patientpal_system"
@@ -31,6 +33,17 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- <receiver android:name="com.yourcompany.background_sms.SmsReceiver" android:permission="android.permission.BROADCAST_SMS">
+                <intent-filter android:priority="1000">
+                    <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+                </intent-filter>
+            </receiver> -->
+            <!-- <receiver
+                android:name="com.dexterous.flutterlocalnotifications.receivers.ActionReceiver"
+                android:exported="true"/> -->
+            <!-- <receiver
+                android:name="com.dexterous.flutterlocalnotifications.receivers.DismissedReceiver"
+                android:exported="true"/> -->
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

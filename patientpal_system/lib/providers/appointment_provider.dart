@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:patientpal_system/providers/notif_service.dart';
 
 class AppointmentProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -147,61 +148,6 @@ void addTimeSlots() async {
   }
 }
 
-class TimeSlotGenerator {
-
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  Future<void> generateTimeSlotsForDoctors() async {
-    final doctors = await _firestore.collection('doctors').get();
-
-    for (var doc in doctors.docs) {
-      Map<String, dynamic> doctorData = doc.data();
-      String doctorId = doc.id;
-      List<String> workDays = List<String>.from(doctorData['work_days']);
-      Map<String, String> workHours = Map<String, String>.from(doctorData['work_hours']);
-
-      for (String day in workDays) {
-        for (var entry in workHours.entries) {
-          String startTime = entry.key;
-          String endTime = entry.value;
-
-          DateTime start = _parseTime(startTime);
-          DateTime end = _parseTime(endTime);
-
-          List<String> timeSlots = _generateTimeSlots(start, end);
-
-          for (var time in timeSlots) {
-            await _firestore.collection('time_slots').add({
-              'date': DateFormat('yyyy-MM-dd').format(DateTime.now()), // Example date; adjust as needed
-              'ailment_type': 'Dental', // Example; adjust based on actual ailments
-              'time': time,
-              'doctor_id': doctorId,
-              'available': true
-            });
-          }
-        }
-      }
-    }
-  }
-
-  DateTime _parseTime(String time) {
-    return DateFormat('HH:mm').parse(time);
-  }
-
-  List<String> _generateTimeSlots(DateTime start, DateTime end) {
-    List<String> slots = [];
-    DateTime current = start;
-
-    while (current.isBefore(end)) {
-      slots.add(DateFormat('HH:mm').format(current));
-      current = current.add(Duration(minutes: 30)); // Slot duration; adjust as needed
-    }
-
-    return slots;
-  }
-}
-
-
 Future<void> generateTimeSlots() async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -274,4 +220,40 @@ Future<List<String>> getAvailableTimeSlots(DateTime date, String doctorId) async
 
   // Return only available slots
   return allSlots.where((slot) => !bookedSlots.contains(slot)).toList();
+}
+
+Future<void> fetchAppointmentsAndScheduleNotifications() async {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  DateTime now = DateTime.now();
+  DateTime tomorrow = DateTime(now.year, now.month, now.day + 1);
+
+  QuerySnapshot snapshot = await firestore.collection('appointments')
+      .where('date_time', isGreaterThanOrEqualTo: DateTime(now.year, now.month, now.day, 0, 0))
+      .get();
+
+  for (var doc in snapshot.docs) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    DateTime appointmentDateTime = (data['date_time'] as Timestamp).toDate();
+
+    if (isSameDay(appointmentDateTime, tomorrow)) {
+      NotificationService().scheduleNotification(
+        id: doc.id.hashCode,
+        title: 'Appointment Reminder',
+        body: 'You have an appointment tomorrow at ${DateFormat('HH:mm').format(appointmentDateTime)}',
+        scheduledDate: DateTime(
+          tomorrow.year,
+          tomorrow.month,
+          tomorrow.day,
+          appointmentDateTime.hour,
+          appointmentDateTime.minute,
+        ),
+      );
+    }
+  }
+}
+
+bool isSameDay(DateTime date1, DateTime date2) {
+  return date1.year == date2.year &&
+         date1.month == date2.month &&
+         date1.day == date2.day;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:patientpal_system/main.dart';
 import 'package:uuid/uuid.dart';
 
 class DoctorRegistrationPage extends StatefulWidget {
@@ -39,6 +40,17 @@ class _DoctorRegistrationPageState extends State<DoctorRegistrationPage> {
           'end': _endHourController.text,
         },
       });
+
+
+      for (String day in _selectedDays) {
+        await generateDailyTimeSlots(
+          FirebaseFirestore.instance,
+          uid,
+          day,
+          _startHourController.text,
+          _endHourController.text,
+        );
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Doctor registered successfully!')),

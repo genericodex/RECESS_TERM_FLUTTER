@@ -18,7 +18,6 @@ class _LocationScreenState extends State<LocationScreen> {
   LocationData? _currentLocation;
   maps.LatLng _ambulanceLocation = maps.LatLng(0.327771, 32.570843); // Example ambulance location
   List<maps.LatLng> _routeCoordinates = [];
-  // final bool _cameraNeedsUpdate = true;
 
   final Location _location = Location();
   maps.LatLng? _lastCameraPosition;
@@ -52,23 +51,22 @@ class _LocationScreenState extends State<LocationScreen> {
 
     _currentLocation = await _location.getLocation();
     _location.onLocationChanged.listen((LocationData locationData) {
-  if (_mapController != null && !_userMovedMap) {
-    if (_lastCameraPosition == null || _distanceBetween(_lastCameraPosition!, maps.LatLng(locationData.latitude!, locationData.longitude!)) > 0.01) {
-      _mapController!.animateCamera(maps.CameraUpdate.newCameraPosition(
-        maps.CameraPosition(
-          target: maps.LatLng(locationData.latitude!, locationData.longitude!),
-          zoom: 14.0,
-        ),
-      ));
-      _lastCameraPosition = maps.LatLng(locationData.latitude!, locationData.longitude!);
-    }
-  }
-  setState(() {
-    _currentLocation = locationData;
-  });
-  _getRoute();
-});
-
+      if (_mapController != null && !_userMovedMap) {
+        if (_lastCameraPosition == null || _distanceBetween(_lastCameraPosition!, maps.LatLng(locationData.latitude!, locationData.longitude!)) > 0.01) {
+          _mapController!.animateCamera(maps.CameraUpdate.newCameraPosition(
+            maps.CameraPosition(
+              target: maps.LatLng(locationData.latitude!, locationData.longitude!),
+              zoom: 14.0,
+            ),
+          ));
+          _lastCameraPosition = maps.LatLng(locationData.latitude!, locationData.longitude!);
+        }
+      }
+      setState(() {
+        _currentLocation = locationData;
+      });
+      _getRoute();
+    });
   }
 
   void _onMapCreated(maps.GoogleMapController controller) {
@@ -78,11 +76,10 @@ class _LocationScreenState extends State<LocationScreen> {
       _mapController!.animateCamera(maps.CameraUpdate.newCameraPosition(
         maps.CameraPosition(
           target: maps.LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-          zoom: 0.0,
+          zoom: 14.0,
         ),
       ));
       _getRoute();
-      
     }
   }
 
@@ -103,38 +100,42 @@ class _LocationScreenState extends State<LocationScreen> {
     }
   }
 
-  List<maps.LatLng> _decodePolyline(String poly) {
-    var list = poly.codeUnits;
-    var lList = [];
-    int index = 0;
-    int len = poly.length;
-    int c = 0;
-    do {
-      var shift = 0;
-      int result = 0;
+  List<maps.LatLng> _decodePolyline(String polyline) {
+    List<maps.LatLng> coordinates = [];
+    int index = 0, len = polyline.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+
       do {
-        c = list[index] - 63;
-        result |= (c & 0x1F) << (shift * 5);
-        index++;
-        shift++;
-      } while (c >= 32);
-      if (result & 1 == 1) {
-        result = ~result;
-      }
-      var result1 = (result >> 1) * 0.00001;
-      lList.add(result1);
-    } while (index < len);
-    for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
-    List<maps.LatLng> polyline = [];
-    for (var i = 0; i < lList.length; i += 2) {
-      if (lList[i + 1] != null) {
-        polyline.add(maps.LatLng(lList[i], lList[i + 1]));
-      }
+        b = polyline.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+
+      do {
+        b = polyline.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      coordinates.add(maps.LatLng(lat / 1E5, lng / 1E5));
     }
-    return polyline;
+
+    return coordinates;
   }
 
-double _distanceBetween(maps.LatLng start, maps.LatLng end) {
+  double _distanceBetween(maps.LatLng start, maps.LatLng end) {
     const double p = 0.017453292519943295; // Math.PI / 180
     final double a = 0.5 - cos((end.latitude - start.latitude) * p) / 2 +
         cos(start.latitude * p) * cos(end.latitude * p) *
@@ -160,15 +161,11 @@ double _distanceBetween(maps.LatLng start, maps.LatLng end) {
                   onMapCreated: _onMapCreated,
                   initialCameraPosition: maps.CameraPosition(
                     target: maps.LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                    zoom: 0.0,
+                    zoom: 14.0,
                   ),
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
                   markers: {
-                    // maps.Marker(
-                    //   markerId: maps.MarkerId('currentLocation'),
-                    //   position: maps.LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                    // ),
                     maps.Marker(
                       markerId: maps.MarkerId('ambulanceLocation'),
                       position: _ambulanceLocation,

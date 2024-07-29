@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
+import 'package:patientpal_system/screens/home/home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -34,11 +35,30 @@ class _BookingPageState extends State<BookingPage> {
           .get();
 
       if (doctorSnapshot.docs.isNotEmpty) {
-        var doctor = doctorSnapshot.docs.first.data() as Map<String, dynamic>;
-        setState(() {
-          _selectedDoctorId = doctorSnapshot.docs.first.id;
-          _workDays = List<String>.from(doctor['working_days']);
-        });
+        String? selectedDoctorId;
+        int minAppointments = double.maxFinite.toInt();
+
+        for (var doc in doctorSnapshot.docs) {
+          String doctorId = doc.id;
+          QuerySnapshot appointmentSnapshot = await firestore
+              .collection('appointments')
+              .where('doctorId', isEqualTo: doctorId)
+              .get();
+
+          int appointmentCount = appointmentSnapshot.docs.length;
+          if (appointmentCount < minAppointments) {
+            minAppointments = appointmentCount;
+            selectedDoctorId = doctorId;
+          }
+        }
+
+        if (selectedDoctorId != null) {
+          var doctorData = doctorSnapshot.docs.firstWhere((doc) => doc.id == selectedDoctorId).data() as Map<String, dynamic>;
+          setState(() {
+            _selectedDoctorId = selectedDoctorId;
+            _workDays = List<String>.from(doctorData['working_days']);
+          });
+        }
       }
     } catch (e) {
       print('Error fetching doctor workdays: $e');
@@ -55,8 +75,23 @@ class _BookingPageState extends State<BookingPage> {
           .where('day', isEqualTo: workDay)
           .get();
 
+      List<Map<String, dynamic>> fetchedSlots = snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+
+    // Sort the time slots by the 'time' field
+      fetchedSlots.sort((a, b) => a['time'].compareTo(b['time']));
+
+
+      Set<String> uniqueTimes = Set<String>();
+          List<Map<String, dynamic>> uniqueSlots = [];
+
+          for (var slot in fetchedSlots) {
+            if (uniqueTimes.add(slot['time'])) {
+              uniqueSlots.add(slot);
+            }
+          }
+
       setState(() {
-        _availableTimeSlots = snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+        _availableTimeSlots = uniqueSlots;
       });
     } catch (e) {
       print('Error fetching available time slots: $e');
@@ -110,23 +145,16 @@ class _BookingPageState extends State<BookingPage> {
   return GestureDetector(
     onTap: onTap,
     child: Container(
-      width: MediaQuery.of(context).size.width * 0.4,
-      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+      // height: 10,
+      width: 120,
+      margin: const EdgeInsets.symmetric(horizontal: 4.0),
       decoration: BoxDecoration(
         border: Border.all(
-          color: isSelected ? Color.fromARGB(255, 30, 181, 108) : Color.fromARGB(255, 229, 228, 228), // Border color
+          color: isSelected ? Color.fromARGB(255, 3, 71, 48) : Color.fromARGB(255, 229, 228, 228), // Border color
           width: 2.0, // Border width
         ),
-        color: isSelected ? Color.fromARGB(255, 170, 253, 196) : Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
-        // boxShadow: [
-        //   if (isSelected)
-        //     BoxShadow(
-        //       color: Color.fromARGB(255, 1, 69, 39).withOpacity(0.5),
-        //       spreadRadius: 2,
-        //       blurRadius: 5,
-        //     ),
-        // ],
+        color: isSelected ? Color.fromARGB(255, 2, 99, 75) : Colors.white,
+        borderRadius: BorderRadius.circular(36.0),
       ),
       child: Center(
         child: Padding(
@@ -135,9 +163,9 @@ class _BookingPageState extends State<BookingPage> {
             day,
             style: GoogleFonts.poppins(
               textStyle: TextStyle(
-                color: isSelected ? Color.fromARGB(255, 0, 45, 6) : Color.fromARGB(255, 0, 175, 62),
+                color: isSelected ? Color.fromARGB(255, 184, 247, 226) : Color.fromARGB(255, 1, 136, 102),
                 letterSpacing: .5,
-                fontSize: 20,
+                fontSize: 15,
                 )
               )
           ),
@@ -151,12 +179,22 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 240, 240, 240),
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+              (Route<dynamic> route) => false,
+            );
+          },
+        ),
         title: Text('Book an Appointment',
         style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5)),
         ),
-        backgroundColor: Color.fromARGB(255, 24, 176, 123),
+        backgroundColor: Color.fromARGB(255, 24, 176, 151),
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -175,7 +213,7 @@ class _BookingPageState extends State<BookingPage> {
               ),
               SizedBox(height: 8),
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.15,
+                height: MediaQuery.of(context).size.height * 0.07,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: _ailments.map((ailment) {
@@ -210,7 +248,7 @@ class _BookingPageState extends State<BookingPage> {
                 )),
                         SizedBox(height: 8),
                         SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.15,
+                          height: MediaQuery.of(context).size.height * 0.07,
                           child: ListView(
                             scrollDirection: Axis.horizontal,
                             children: _workDays.map((day) {
@@ -244,12 +282,12 @@ class _BookingPageState extends State<BookingPage> {
         _availableTimeSlots.isEmpty
             ? Center(child: Text('Please select a work day.', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.black, letterSpacing: .5)),),)
             : SizedBox(
-          height: MediaQuery.of(context).size.height * 0.1,
+          height: MediaQuery.of(context).size.height * 0.15,
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: _availableTimeSlots.map((slot) {
               return Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(16.0),
                 child: GestureDetector(
                   onTap: () {
                     setState(() {
@@ -257,16 +295,18 @@ class _BookingPageState extends State<BookingPage> {
                     });
                   },
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.3,
+                    width: MediaQuery.of(context).size.width * 0.14,
                     decoration: BoxDecoration(
                       border: Border.all(
-            color: _selectedTimeSlot == slot['time'] ? Color.fromARGB(255, 30, 181, 108) : Color.fromARGB(255, 229, 228, 228), // Border color
+            color: _selectedTimeSlot == slot['time'] 
+            ? Color.fromARGB(255, 3, 71, 48) 
+            : Color.fromARGB(255, 229, 228, 228), // Border color
             width: 2.0, // Border width
           ),
                       color: _selectedTimeSlot == slot['time']
-                          ? Color.fromARGB(255, 170, 253, 196)
+                          ? Color.fromARGB(255, 2, 85, 64) 
                           : Colors.white,
-                      borderRadius: BorderRadius.circular(8.0),
+                      borderRadius: BorderRadius.circular(25.0),
                     ),
                     child: Center(
                       child: Padding(
@@ -275,10 +315,10 @@ class _BookingPageState extends State<BookingPage> {
                                   style: GoogleFonts.poppins(
                 textStyle: TextStyle(
                   color: _selectedTimeSlot == slot['time'] 
-                                    ? Color.fromARGB(255, 0, 45, 6)
-                                    : Color.fromARGB(255, 0, 175, 62),
+                          ? Color.fromARGB(255, 184, 247, 226) 
+                          : Color.fromARGB(255, 1, 136, 102),
                   letterSpacing: .5,
-                  fontSize: 20,
+                  fontSize: 15,
                   )
                 )
                                 ),
@@ -301,13 +341,13 @@ class _BookingPageState extends State<BookingPage> {
                 child: ElevatedButton(
                   onPressed: _bookAppointment,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 0, 150, 80), // Background color
+                    backgroundColor: Color.fromARGB(255, 2, 85, 64) , // Background color
                     foregroundColor: Colors.white, // Text color
                     elevation: 3.0, // Shadow elevation
                     padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0), // Button padding
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0), // Rounded corners
-                      side: BorderSide(color: const Color.fromARGB(255, 100, 255, 131), width: 2.0), // Border color and width
+                       // Border color and width
                     ),
                     textStyle: TextStyle(
                       fontSize: 16.0, // Text size
@@ -316,7 +356,16 @@ class _BookingPageState extends State<BookingPage> {
                       inherit: true, // Ensure inherit is true for consistency
                     ),
                   ),
-                  child: Text('Book Appointment'),
+                  child: Text(
+                    'Book Appointment',
+                    style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                color: Color.fromARGB(255, 184, 247, 226),
+                letterSpacing: .5,
+                fontSize: 15,
+                )
+              )
+                    ),
                 ),
               )
         

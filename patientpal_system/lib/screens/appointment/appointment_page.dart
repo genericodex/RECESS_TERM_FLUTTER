@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:patientpal_system/screens/home/home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
 import 'create_appointment_page.dart';
@@ -19,6 +21,7 @@ class AppointmentsPage extends StatelessWidget {
 
   Future<Card> _buildAppointmentCard(Map<String, dynamic> data, String appointmentId, BuildContext context) async {
     String? dateTime = data['timeSlot'] as String?;
+    String? day = data['workDay'] as String?;
     String ailmentType = data['ailment'] as String;
     bool status = data['isBooked'] as bool;
     String doctorId = data['doctorId'] as String;
@@ -27,24 +30,28 @@ class AppointmentsPage extends StatelessWidget {
     String doctorName = await _fetchDoctorName(doctorId);
 
     return Card(
-      elevation: 5,
+      color: Color.fromARGB(255, 244, 255, 252),
+      elevation: 0,
       margin: EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
+        side: BorderSide(color: Color.fromARGB(65, 0, 150, 135), width: 1.0),
       ),
       child: ListTile(
-        contentPadding: EdgeInsets.all(16.0),
+        contentPadding: EdgeInsets.all(11.0),
         leading: Icon(
-          Icons.calendar_today,
+          FontAwesomeIcons.calendarAlt,
           color: Colors.teal,
           size: 40,
         ),
         title: Text(
-          dateTime != null ? 'Appointment on ${dateTime}' : 'Appointment date not set',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          dateTime != null ? 'Appointment on ${day} at $dateTime' : 'Appointment date not set',
+          style: GoogleFonts.anuphan(
+            textStyle: TextStyle(
+            color: const Color.fromARGB(255, 1, 44, 40), 
+            letterSpacing: .5,
+            fontSize: 16,
+            fontWeight: FontWeight.bold)),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,13 +120,18 @@ class AppointmentsPage extends StatelessWidget {
     final user = context.watch<AuthProvider>().user;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 24, 176, 123),
         title: Text('My Appointments', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+              (Route<dynamic> route) => false,
+            );
           },
         ),
         actions: [

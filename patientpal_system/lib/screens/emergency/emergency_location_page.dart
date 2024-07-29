@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:background_sms/background_sms.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'current_location_page.dart';
 
 class CenterPage extends StatefulWidget {
@@ -27,6 +29,8 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
         curve: Curves.easeInOut,
       ),
     );
+
+    _requestSMSPermissions();
   }
 
   @override
@@ -34,6 +38,29 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
     _controller.dispose();
     super.dispose();
   }
+
+  Future<void> _requestSMSPermissions() async {
+    var status = await Permission.sms.status;
+    if (!status.isGranted) {
+      await Permission.sms.request();
+    }
+  }
+
+  Future<void> _sendSMS(String message, List<String> recipients) async {
+    for (String recipient in recipients) {
+      SmsStatus result = await BackgroundSms.sendMessage(
+        phoneNumber: recipient,
+        message: message,
+      );
+      if (result == SmsStatus.sent) {
+        print("SMS sent to $recipient");
+      } else {
+        print("Failed to send SMS to $recipient: $result");
+      }
+    }
+  }
+
+// 0765813705
 
   Future<void> _onSOSPressed() async {
     try {
@@ -53,6 +80,11 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
 
         // Save emergency request to Firestore
         await FirebaseFirestore.instance.collection('emergency_requests').add(emergencyData);
+
+        // Send SMS
+        String message = 'Emergency reported! Send help to patient at location:(https://www.google.com/maps/search/?api=1&query=${position.latitude},${position.longitude}). He needs help!';
+        List<String> recipients = ['+256779898969']; // Add emergency contact numbers here
+        await _sendSMS(message, recipients);
 
         // Navigate to the location screen
         Navigator.push(
@@ -100,7 +132,7 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
         backgroundColor: Color.fromARGB(255, 143, 38, 68),
         title: Text('SOS Emergency', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,color: Colors.white,),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },

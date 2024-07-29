@@ -4,16 +4,17 @@ import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:patientpal_system/screens/appointment/create_appointment_page.dart';
+import 'package:patientpal_system/screens/auth/notif_screen.dart';
 import 'package:patientpal_system/screens/doctor/doctor_registration_page.dart';
 import 'package:patientpal_system/screens/emergency/emergency_location_page.dart';
 import 'package:provider/provider.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
-import 'package:line_icons/line_icons.dart';
+// import 'package:line_icons/line_icons.dart';
 import 'package:patientpal_system/screens/appointment/appointment_page.dart';
-import 'package:patientpal_system/screens/auth/login_page.dart';
-// import 'package:patientpal_system/screens/feedback/feedback_page.dart';
+// import 'package:patientpal_system/screens/auth/login_page.dart';
+import 'clipper.dart';
 import 'package:patientpal_system/screens/emergency/emergency_page.dart';
 // import 'package:patientpal_system/screens/make_appointment/make_appointment_page.dart';
 
@@ -51,11 +52,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
         useSafeArea: true,
-        labels: const ["My Acppointments", "Home", "Create appointment"],
+        labels: const ["My Acppointments", "Home", "Create appointment", "Notifications"],
         icons: const [
           Ionicons.person_outline,
           FontAwesomeIcons.house,
           FontAwesomeIcons.calendarPlus,
+          FontAwesomeIcons.bell
         ],
         tabSize: 50,
         tabBarHeight: 55,
@@ -82,14 +84,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           AppointmentsPage(),
           _buildHomeContent(userEmail),
           BookingPage(),
-          EmergencyPage(),
+          NotificationsScreen(),
         ],
       ),
     );
   }
 Widget _buildHomeContent(String userEmail) {
   return Scaffold(
-    backgroundColor: Colors.grey[200],
+    backgroundColor: Color.fromARGB(255, 255, 255, 255),
     appBar: AppBar(
       backgroundColor: Color.fromARGB(255, 64, 165, 147)
     ),
@@ -124,55 +126,58 @@ Widget _buildHomeContent(String userEmail) {
     body: SingleChildScrollView(
       child: Column(
         children: [
-          Container(
-            height: 370,  // Adjust the height as needed
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20.0),
-                bottomRight: Radius.circular(20.0),
+          ClipPath(
+            clipper: BottomCurvedClipper(),
+            child: Container(
+              height: 370,  // Adjust the height as needed
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20.0),
+                  bottomRight: Radius.circular(20.0),
+                ),
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 64, 165, 147),
+                    Color.fromARGB(255, 64, 165, 147),
+                  ],
+                ),
               ),
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 64, 165, 147),
-                  Color.fromARGB(255, 64, 165, 147),
+              padding: EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 16),
+                        Text(
+                          ' Welcome to',
+                          style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                  color:  Colors.white,
+                  letterSpacing: .5,
+                  fontSize: 30,
+                  )
+                )
+                        ),
+                        Image.asset(
+                          'assets/icons/app_icon2.png',
+                          height: 32,
+                          color: Color.fromARGB(255, 64, 165, 147),
+                          colorBlendMode: BlendMode.difference,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Image.asset(
+                    'assets/images/main_page_img.png',
+                    width: 140,
+                    height: 220,
+                    fit: BoxFit.cover,
+                  ),
                 ],
               ),
-            ),
-            padding: EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 16),
-                      Text(
-                        ' Welcome to',
-                        style: GoogleFonts.poppins(
-              textStyle: TextStyle(
-                color:  Colors.white,
-                letterSpacing: .5,
-                fontSize: 30,
-                )
-              )
-                      ),
-                      Image.asset(
-                        'assets/icons/app_icon2.png',
-                        height: 32,
-                        color: Color.fromARGB(255, 64, 165, 147),
-                        colorBlendMode: BlendMode.difference,
-                      ),
-                    ],
-                  ),
-                ),
-                Image.asset(
-                  'assets/images/main_page_img.png',
-                  width: 140,
-                  height: 220,
-                  fit: BoxFit.cover,
-                ),
-              ],
             ),
           ),
           //SizedBox(height: 0),
@@ -249,9 +254,9 @@ Widget _buildHomeContent(String userEmail) {
               SizedBox(height: 8),
               Text(
                 title,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.cairo(
               textStyle: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: color
+                fontSize: 14, fontWeight: FontWeight.bold, color: color
                 )
               ),
               ),

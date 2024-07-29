@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart';
 import 'package:patientpal_system/firebase_options.dart';
+import 'package:patientpal_system/providers/notif_service.dart';
 import 'package:patientpal_system/screens/appointment/create_appointment_page.dart';
 import 'package:provider/provider.dart';
 import 'package:patientpal_system/providers/doctor_provider.dart';
@@ -19,7 +20,7 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    // FirebaseFirestore firestore = FirebaseFirestore.instance;
+    await NotificationService().init();
 
     runApp(
       MultiProvider(
@@ -33,12 +34,14 @@ void main() async {
     );
 
     // Generating time slots after initializing the app
-    // await generateTimeSlots(firestore);
+    await fetchAppointmentsAndScheduleNotifications();
   } catch (e) {
     print('Error initializing Firebase or fetching Firestore data: $e');
     runApp(ErrorApp());
   }
-}Future<void> generateDailyTimeSlots(FirebaseFirestore firestore, String doctorId, String day, String startTime, String endTime) async {
+}
+
+Future<void> generateDailyTimeSlots(FirebaseFirestore firestore, String doctorId, String day, String startTime, String endTime) async {
   try {
     // Ensure times are in the correct format
     DateFormat inputFormat = DateFormat("H:mm");
