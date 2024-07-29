@@ -4,7 +4,6 @@ import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:patientpal_system/screens/appointment/create_appointment_page.dart';
-import 'package:patientpal_system/screens/auth/notif_screen.dart';
 import 'package:patientpal_system/screens/auth/profile_page.dart';
 import 'package:patientpal_system/screens/doctor/doctor_registration_page.dart';
 import 'package:patientpal_system/screens/emergency/emergency_location_page.dart';
@@ -89,40 +88,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 Widget _buildHomeContent(String userEmail) {
   return Scaffold(
     backgroundColor: Color.fromARGB(255, 255, 255, 255),
-    // appBar: AppBar(
-    //   backgroundColor: Color.fromARGB(255, 168, 255, 239)
-    // ),
-    // drawer: Drawer(
-    //      child: ListView(
-    //       children: [
-    //         DrawerHeader(
-    //           child: Text('Menu'),
-    //           decoration: BoxDecoration(
-    //             color: Color.fromARGB(255, 24, 176, 123),
-    //           ),
-    //         ),
-    //         ListTile(
-    //           title: Text('Profile'),
-    //           onTap: () {
-    //             Navigator.push(
-    //               context,
-    //               MaterialPageRoute(builder: (context) => ProfilePage()),
-    //             );
-    //           },
-    //         ),
-    //         ListTile(
-    //           title: Text('Register Doctor'),
-    //           onTap: () {
-    //             Navigator.push(
-    //               context,
-    //               MaterialPageRoute(builder: (context) => DoctorRegistrationPage()),
-    //             );
-    //           },
-    //         ),
-    //       ],
-    //     )
-
-    //   ),  // Change this to your desired background color
     body: SingleChildScrollView(
       child: Column(
         children: [

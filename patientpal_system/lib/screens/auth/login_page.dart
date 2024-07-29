@@ -136,7 +136,7 @@ Future<String?> _authenticateUser(BuildContext context, LoginData data) async {
       data.password!,
       additionalData!['firstName']!,
       additionalData['lastName']!,
-      additionalData!['emergencyNumber']!,
+      additionalData['emergencyNumber']!,
       );
     return null;
   } catch (e) {
