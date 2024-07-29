@@ -6,6 +6,7 @@ import 'package:patientpal_system/screens/home/home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
 import 'create_appointment_page.dart';
+import 'package:intl/intl.dart'; // For date formatting
 
 class AppointmentsPage extends StatelessWidget {
   Future<String> _fetchDoctorName(String doctorId) async {
@@ -25,9 +26,13 @@ class AppointmentsPage extends StatelessWidget {
     String ailmentType = data['ailment'] as String;
     bool status = data['isBooked'] as bool;
     String doctorId = data['doctorId'] as String;
+    Timestamp? timestamp = data['date'] as Timestamp?;
 
     // Fetch doctor's name
     String doctorName = await _fetchDoctorName(doctorId);
+
+    // Format the date if it exists
+    String formattedDate = timestamp != null ? DateFormat('MMMM d, yyyy').format(timestamp.toDate()) : 'Unknown Date';
 
     return Card(
       color: Color.fromARGB(255, 244, 255, 252),
@@ -45,13 +50,13 @@ class AppointmentsPage extends StatelessWidget {
           size: 40,
         ),
         title: Text(
-          dateTime != null ? 'Appointment on ${day} at $dateTime' : 'Appointment date not set',
+          dateTime != null ? 'Appointment on $day $formattedDate at $dateTime' : 'Appointment date not set',
           style: GoogleFonts.anuphan(
             textStyle: TextStyle(
-            color: const Color.fromARGB(255, 1, 44, 40), 
-            letterSpacing: .5,
-            fontSize: 16,
-            fontWeight: FontWeight.bold)),
+              color: const Color.fromARGB(255, 1, 44, 40), 
+              letterSpacing: .5,
+              fontSize: 16,
+              fontWeight: FontWeight.bold)),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +74,7 @@ class AppointmentsPage extends StatelessWidget {
             SizedBox(height: 4.0),
             Text(
               status ? 'Status: Booked' : 'Status: Available',
-              style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.grey, letterSpacing: .5,fontSize: 16)),
+              style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 92, 116, 108), letterSpacing: .5,fontSize: 16)),
             ),
           ],
         ),
@@ -122,7 +127,7 @@ class AppointmentsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 24, 176, 123),
+        backgroundColor: Color.fromARGB(255, 24, 176, 161),
         title: Text('My Appointments', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),

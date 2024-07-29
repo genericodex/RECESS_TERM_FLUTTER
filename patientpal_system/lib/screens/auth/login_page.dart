@@ -31,9 +31,13 @@ class LoginScreen extends StatelessWidget {
       onLogin: (loginData) => _authenticateUser(context, loginData),
       onSignup: (signupData) => _signupUser(context, signupData),
       onSubmitAnimationCompleted: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage())); // Navigate to MyHomePage
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        if (authProvider.isLoggedIn) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        }// Navigate to MyHomePage
       },
       onRecoverPassword: _recoverPassword,
       theme: LoginTheme(
@@ -46,7 +50,7 @@ class LoginScreen extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
         bodyStyle: TextStyle(
-          color: Color.fromARGB(255, 44, 188, 15),
+          color: Color.fromARGB(255, 15, 188, 113),
         ),
         textFieldStyle: TextStyle(
           color: Colors.black,
@@ -77,8 +81,8 @@ class LoginScreen extends StatelessWidget {
         ),
         buttonTheme: LoginButtonTheme(
           splashColor: Color.fromARGB(255, 220, 214, 239),
-          backgroundColor: Color.fromARGB(255, 63, 165, 87),
-          highlightColor: Colors.green,
+          backgroundColor: Color.fromARGB(255, 63, 165, 124),
+          highlightColor: Color.fromARGB(255, 8, 235, 144),
           elevation: 9.0,
           highlightElevation: 6.0,
           shape: RoundedRectangleBorder(
@@ -89,7 +93,22 @@ class LoginScreen extends StatelessWidget {
           // it to the corresponding buttonTheme
           //radius: 30.0,
         ),
+        
       ),
+      additionalSignupFields: [
+        UserFormField(
+          keyName: 'firstName',
+          displayName: 'First Name',
+        ),
+        UserFormField(
+          keyName: 'lastName',
+          displayName: 'Last Name',
+        ),
+        UserFormField(
+          keyName: 'emergencyNumber',
+          displayName: 'Emergency Number',
+        ),
+      ],
     );
   }
 }
@@ -97,21 +116,33 @@ class LoginScreen extends StatelessWidget {
 Future<String?> _authenticateUser(BuildContext context, LoginData data) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     try {
-      await authProvider.login(data.name, data.password);
+    await authProvider.login(data.name, data.password);
+    if (authProvider.isLoggedIn) {
       return null;
-    } catch (e) {
-      return 'Login failed: ${e.toString()}';
+    } else {
+      return 'Login failed: User not found';
     }
+  } catch (e) {
+    return 'Login failed: ${e.toString()}';
+  }
   }
 
   Future<String?> _signupUser(BuildContext context, SignupData data) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    try {
-      await authProvider.register(data.name!, data.password!);
-      return null;
-    } catch (e) {
-      return 'Registration failed: ${e.toString()}';
-    }
+      try {
+        final additionalData = data.additionalSignupData;
+    await authProvider.register(
+      data.name!, 
+      data.password!,
+      additionalData!['firstName']!,
+      additionalData['lastName']!,
+      additionalData!['emergencyNumber']!,
+      );
+    return null;
+  } catch (e) {
+    return 'Registration failed: ${e.toString()}';
+  }
+  
   }
 
   Future<String?> _recoverPassword(String name) async {

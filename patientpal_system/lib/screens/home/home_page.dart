@@ -5,18 +5,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:patientpal_system/screens/appointment/create_appointment_page.dart';
 import 'package:patientpal_system/screens/auth/notif_screen.dart';
+import 'package:patientpal_system/screens/auth/profile_page.dart';
 import 'package:patientpal_system/screens/doctor/doctor_registration_page.dart';
 import 'package:patientpal_system/screens/emergency/emergency_location_page.dart';
 import 'package:provider/provider.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
-// import 'package:line_icons/line_icons.dart';
 import 'package:patientpal_system/screens/appointment/appointment_page.dart';
-// import 'package:patientpal_system/screens/auth/login_page.dart';
 import 'clipper.dart';
-import 'package:patientpal_system/screens/emergency/emergency_page.dart';
-// import 'package:patientpal_system/screens/make_appointment/make_appointment_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -52,12 +49,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
         useSafeArea: true,
-        labels: const ["My Acppointments", "Home", "Create appointment", "Notifications"],
+        labels: const ["My Profile", "Home", "My appointment", "Register Doctor"],
         icons: const [
           Ionicons.person_outline,
           FontAwesomeIcons.house,
-          FontAwesomeIcons.calendarPlus,
-          FontAwesomeIcons.bell
+          FontAwesomeIcons.calendarWeek,
+          FontAwesomeIcons.userDoctor
         ],
         tabSize: 50,
         tabBarHeight: 55,
@@ -81,10 +78,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       body: IndexedStack(
         index: _motionTabBarController!.index,
         children: [
-          AppointmentsPage(),
+          ProfilePage(),
           _buildHomeContent(userEmail),
-          BookingPage(),
-          NotificationsScreen(),
+          AppointmentsPage(),
+          DoctorRegistrationPage(),
         ],
       ),
     );
@@ -92,37 +89,40 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 Widget _buildHomeContent(String userEmail) {
   return Scaffold(
     backgroundColor: Color.fromARGB(255, 255, 255, 255),
-    appBar: AppBar(
-      backgroundColor: Color.fromARGB(255, 64, 165, 147)
-    ),
-    drawer: Drawer(
-         child: ListView(
-          children: [
-            DrawerHeader(
-              child: Text('Menu'),
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 24, 176, 123),
-              ),
-            ),
-            ListTile(
-              title: Text('Home'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text('Register Doctor'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DoctorRegistrationPage()),
-                );
-              },
-            ),
-          ],
-        )
+    // appBar: AppBar(
+    //   backgroundColor: Color.fromARGB(255, 168, 255, 239)
+    // ),
+    // drawer: Drawer(
+    //      child: ListView(
+    //       children: [
+    //         DrawerHeader(
+    //           child: Text('Menu'),
+    //           decoration: BoxDecoration(
+    //             color: Color.fromARGB(255, 24, 176, 123),
+    //           ),
+    //         ),
+    //         ListTile(
+    //           title: Text('Profile'),
+    //           onTap: () {
+    //             Navigator.push(
+    //               context,
+    //               MaterialPageRoute(builder: (context) => ProfilePage()),
+    //             );
+    //           },
+    //         ),
+    //         ListTile(
+    //           title: Text('Register Doctor'),
+    //           onTap: () {
+    //             Navigator.push(
+    //               context,
+    //               MaterialPageRoute(builder: (context) => DoctorRegistrationPage()),
+    //             );
+    //           },
+    //         ),
+    //       ],
+    //     )
 
-      ),  // Change this to your desired background color
+    //   ),  // Change this to your desired background color
     body: SingleChildScrollView(
       child: Column(
         children: [
@@ -136,9 +136,11 @@ Widget _buildHomeContent(String userEmail) {
                   bottomRight: Radius.circular(20.0),
                 ),
                 gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                   colors: [
-                    Color.fromARGB(255, 64, 165, 147),
-                    Color.fromARGB(255, 64, 165, 147),
+                    Color.fromARGB(255, 128, 235, 215),
+                    Color.fromARGB(255, 57, 156, 138),
                   ],
                 ),
               ),
@@ -154,26 +156,27 @@ Widget _buildHomeContent(String userEmail) {
                         Text(
                           ' Welcome to',
                           style: GoogleFonts.poppins(
-                textStyle: TextStyle(
-                  color:  Colors.white,
-                  letterSpacing: .5,
-                  fontSize: 30,
-                  )
-                )
+                          textStyle: TextStyle(
+                            color:  Color.fromARGB(255, 241, 255, 251),
+                            letterSpacing: .5,
+                            fontSize: 30,
+                            )
+                          )
                         ),
                         Image.asset(
                           'assets/icons/app_icon2.png',
                           height: 32,
-                          color: Color.fromARGB(255, 64, 165, 147),
+                          color: Color.fromARGB(255, 69, 185, 163),
                           colorBlendMode: BlendMode.difference,
+                          fit: BoxFit.fill,
                         ),
                       ],
                     ),
                   ),
                   Image.asset(
                     'assets/images/main_page_img.png',
-                    width: 140,
-                    height: 220,
+                    width: 200,
+                    height: 300,
                     fit: BoxFit.cover,
                   ),
                 ],
@@ -190,7 +193,7 @@ Widget _buildHomeContent(String userEmail) {
               mainAxisSpacing: 16,
               children: [
                 _buildGridItem(FontAwesomeIcons.userDoctor, 'Make Appointment', context, BookingPage(), color: Color.fromARGB(255, 38, 163, 143)),
-                _buildGridItem(FontAwesomeIcons.truckMedical, 'Emergency', context, CenterPage(), color: Color.fromARGB(255, 209, 23, 23), iconcolor: Color.fromARGB(255, 209, 23, 23)),
+                _buildGridItem('assets/images/emergency.png', 'Emergency', context, CenterPage(), color: Color.fromARGB(255, 209, 23, 23), iconcolor: Color.fromARGB(255, 209, 23, 23)),
                 _buildGridItem(FontAwesomeIcons.calendarCheck, 'My Appointments', context, AppointmentsPage(), color: Color.fromARGB(255, 38, 163, 143)),
               ],
             ),

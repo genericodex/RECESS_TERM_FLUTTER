@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:patientpal_system/screens/home/home_page.dart';
+import 'package:provider/provider.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:patientpal_system/providers/auth_provider.dart';
+
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -10,62 +15,53 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final _formKey = GlobalKey<FormState>();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  late User _user;
-  String? _firstName, _lastName, _phoneNumber, _profilePicUrl;
-  File? _profilePic;
-  final ImagePicker _picker = ImagePicker();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  File? _image;
 
   @override
   void initState() {
     super.initState();
-    _user = _auth.currentUser!;
-    _loadUserProfile();
+    _loadUserData();
   }
 
-  Future<void> _loadUserProfile() async {
-    DocumentSnapshot doc = await _firestore.collection('users').doc(_user.uid).get();
-    if (doc.exists) {
-      setState(() {
-        _firstName = doc['firstName'];
-        _lastName = doc['lastName'];
-        _phoneNumber = doc['phoneNumber'];
-        _profilePicUrl = doc['profilePicUrl'];
-      });
+  Future<void> _loadUserData() async {
+    final user = Provider.of<AuthProvider>(context, listen: false).user;
+    if (user != null) {
+      final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (userData.exists) {
+        final data = userData.data()!;
+        _firstNameController.text = data['firstName'] ?? '';
+        _lastNameController.text = data['lastName'] ?? '';
+        _phoneController.text = data['emergencyNumber'] ?? '';
+        _emailController.text = data['email'] ?? '';
+        setState(() {
+          _image = data['profileImageUrl'] != null ? File(data['profileImageUrl']) : null;
+        });
+      }
     }
   }
 
-  Future<void> _updateProfile() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-
-      Map<String, dynamic> profileData = {
-        'firstName': _firstName,
-        'lastName': _lastName,
-        'phoneNumber': _phoneNumber,
-        'profilePicUrl': _profilePicUrl,
-      };
-
-      await _firestore.collection('users').doc(_user.uid).set(profileData, SetOptions(merge: true));
-
-      // Show confirmation message
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated')));
+  Future<void> _updateUserData() async {
+    final user = Provider.of<AuthProvider>(context, listen: false).user;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'firstName': _firstNameController.text,
+        'lastName': _lastNameController.text,
+        'emergencyNumber': _phoneController.text,
+        'email': _emailController.text,
+        'profileImageUrl': _image?.path,
+      },SetOptions(merge: true));
     }
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _profilePic = File(pickedFile.path);
-      });
-
-      // Here you would upload the image to Firebase Storage and get the URL to save in Firestore
-      // For demonstration, just setting a placeholder URL
-      setState(() {
-        _profilePicUrl = 'https://example.com/profile-pic-url'; // Replace with actual URL
+        _image = File(pickedFile.path);
       });
     }
   }
@@ -74,58 +70,162 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: GestureDetector(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: _profilePic != null
-                        ? FileImage(_profilePic!)
-                        : _profilePicUrl != null
-                            ? NetworkImage(_profilePicUrl!) as ImageProvider
-                            : AssetImage('assets/images/default.jpeg'), // Replace with your default profile pic asset
-                    child: _profilePic == null && _profilePicUrl == null
-                        ? Icon(Icons.camera_alt, size: 50, color: Colors.grey[700])
-                        : null,
-                  ),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              TextFormField(
-                initialValue: _firstName,
-                decoration: InputDecoration(labelText: 'First Name'),
-                onSaved: (value) => _firstName = value,
-                validator: (value) => value!.isEmpty ? 'Please enter your first name' : null,
-              ),
-              TextFormField(
-                initialValue: _lastName,
-                decoration: InputDecoration(labelText: 'Last Name'),
-                onSaved: (value) => _lastName = value,
-                validator: (value) => value!.isEmpty ? 'Please enter your last name' : null,
-              ),
-              TextFormField(
-                initialValue: _phoneNumber,
-                decoration: InputDecoration(labelText: 'Phone Number'),
-                onSaved: (value) => _phoneNumber = value,
-                validator: (value) => value!.isEmpty ? 'Please enter your phone number' : null,
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _updateProfile,
-                child: Text('Update Profile'),
-              ),
-            ],
-          ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+              (Route<dynamic> route) => false,
+            );
+          },
         ),
+        title: Text(
+          'My Profile',
+          style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5)),
+        ),
+        backgroundColor: Color.fromARGB(255, 24, 176, 151),
+        foregroundColor: Colors.white,
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 199, 255, 241)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Center(
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundImage: _image != null
+                              ? FileImage(_image!)
+                              : AssetImage('assets/images/default.jpeg') as ImageProvider,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: IconButton(
+                            icon: Icon(Icons.camera_alt, color: Colors.white),
+                            onPressed: _pickImage,
+                            color: const Color.fromARGB(255, 33, 243, 170),
+                            iconSize: 30,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _firstNameController,
+                    decoration: InputDecoration(
+                      labelText: 'First Name',
+                      labelStyle: TextStyle(color: Colors.black),
+                      prefixIcon: Icon(Icons.person, color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.2),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 1, 59, 47)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
+                      ),
+                    ),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _lastNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Last Name',
+                      labelStyle: TextStyle(color: Colors.black),
+                      prefixIcon: Icon(Icons.person, color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.2),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
+                      ),
+                    ),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _phoneController,
+                    decoration: InputDecoration(
+                      labelText: 'Emergency Number',
+                      labelStyle: TextStyle(color: Colors.black),
+                      prefixIcon: Icon(Icons.phone, color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.2),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
+                      ),
+                    ),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  SizedBox(height: 30),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      labelStyle: TextStyle(color: Colors.black),
+                      prefixIcon: Icon(Icons.phone, color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.2),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
+                      ),
+                    ),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: _updateUserData,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white, 
+                      backgroundColor: Color.fromARGB(255, 7, 179, 133),
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: Text(
+                      'Update Profile',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
