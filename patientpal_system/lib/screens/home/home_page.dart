@@ -175,23 +175,25 @@ Widget _buildHomeContent(String userEmail) {
       //height: 150,
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 2,
-            offset: Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: Color.fromARGB(255, 181, 230, 224), width: 1),
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withOpacity(0.2),
+        //     spreadRadius: 2,
+        //     blurRadius: 2,
+        //     offset: Offset(0, 2),
+        //   ),
+        // ],
         borderRadius: BorderRadius.circular(12),
       ),
       child: SizedBox(
-        height: 150,
+        height: 50,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color.fromARGB(255, 248, 246, 246),
-            padding: EdgeInsets.all(16),
-            minimumSize: Size(double.infinity, 150),
+            elevation: 0.5,
+            backgroundColor: Color.fromARGB(255, 249, 255, 254),
+            padding: EdgeInsets.all(11),
+            minimumSize: Size(double.infinity, 50),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
