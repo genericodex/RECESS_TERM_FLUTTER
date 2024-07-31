@@ -82,7 +82,7 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
         await FirebaseFirestore.instance.collection('emergency_requests').add(emergencyData);
 
         // Send SMS
-        String message = 'Emergency reported! Send help to patient at location:(https://www.google.com/maps/search/?api=1&query=${position.latitude},${position.longitude}). He needs help!';
+        String message = 'Emergency reported! Send help to patient at location:(https://www.google.com/maps/search/?api=1&query=${position.latitude},${position.longitude}).';
         List<String> recipients = ['+256779898969']; // Add emergency contact numbers here
         await _sendSMS(message, recipients);
 
