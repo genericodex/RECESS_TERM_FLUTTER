@@ -91,11 +91,12 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 199, 255, 241)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+              color: Colors.grey[50],
+              // gradient: LinearGradient(
+              //   colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 199, 255, 241)],
+              //   begin: Alignment.topCenter,
+              //   end: Alignment.bottomCenter,
+              // ),
             ),
           ),
           SafeArea(
@@ -116,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           bottom: 0,
                           right: 0,
                           child: IconButton(
-                            icon: Icon(Icons.camera_alt, color: Colors.white),
+                            icon: Icon(Icons.camera_alt, color: Colors.grey),
                             onPressed: _pickImage,
                             color: const Color.fromARGB(255, 33, 243, 170),
                             iconSize: 30,
@@ -210,7 +211,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     onPressed: _updateUserData,
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white, 
-                      backgroundColor: Color.fromARGB(255, 7, 179, 133),
+                      backgroundColor: Color.fromARGB(255, 57, 156, 138),
                       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
