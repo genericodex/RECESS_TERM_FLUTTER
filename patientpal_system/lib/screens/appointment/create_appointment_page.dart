@@ -328,7 +328,7 @@ class _BookingPageState extends State<BookingPage> {
                     textStyle: TextStyle(
                       color: Colors.black,
                       letterSpacing: .5,
-                      fontSize: 20,
+                      fontSize: 21,
                     ),
                   )),
               _availableTimeSlots.isEmpty

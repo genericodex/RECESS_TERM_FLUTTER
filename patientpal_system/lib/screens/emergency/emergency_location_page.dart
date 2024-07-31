@@ -128,16 +128,16 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 143, 38, 68),
-        title: Text('SOS Emergency', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Color.fromARGB(255, 143, 38, 68),
+      //   title: Text('SOS Emergency', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
+      //   leading: IconButton(
+      //     icon: Icon(Icons.arrow_back, color: Colors.white),
+      //     onPressed: () {
+      //       Navigator.pop(context);
+      //     },
+      //   ),
+      // ),
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
@@ -154,10 +154,10 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
                   );
                 },
                 child: Container(
-                  width: 200,
-                  height: 200,
+                  width: 270,
+                  height: 270,
                   decoration: BoxDecoration(
-                    color: Colors.pink,
+                    color: Color.fromARGB(255, 179, 13, 68),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
@@ -175,7 +175,7 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
                           'SOS',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 40,
+                            fontSize: 60,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

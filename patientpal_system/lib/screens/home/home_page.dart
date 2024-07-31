@@ -90,92 +90,143 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 Widget _buildHomeContent(String userEmail) {
   return Scaffold(
     backgroundColor: Colors.grey[50],
-    body: SingleChildScrollView(
-      child: Column(
-        children: [
-          ClipPath(
-            clipper: BottomCurvedClipper(),
-            child: Stack(
-              children: [Container(
-                height: 370,  // Adjust the height as needed
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20.0),
-                    bottomRight: Radius.circular(20.0),
-                  ),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color.fromARGB(255, 128, 235, 215),
-                      Color.fromARGB(255, 57, 156, 138),
-                    ],
+    body: Stack(
+      children:[
+        Container(
+          height: 150,
+          color: Colors.grey[50],),
+      SingleChildScrollView(
+        child: Column(
+          children: [
+            //SizedBox(height: 20),
+            // Text(
+            //   'Greetings!',
+            //   style: GoogleFonts.poppins(
+            //     textStyle: TextStyle(
+            //       color: Colors.black, // Adjust color as needed
+            //       fontSize: 24, // Adjust size as needed
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // ),
+            //Container(
+            SizedBox(height: 60),
+              //height: 60,
+              //color: Colors.blue),
+                 Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 18.0),
+                child: Text(
+                  'Greetings!',
+                  style: GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
+                      fontSize: 24, // Adjust size as needed
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                padding: EdgeInsets.all(16.0),
-                child: Row(
+              ),
+            ),
+            SizedBox(height: 10,),
+            
+            Padding(
+              padding: const EdgeInsets.only(left:10.0, right:10.0),
+              // child: ClipPath(
+              //   clipper: TopBottomCurvedClipper(), // Custom clipper for top and bottom curves
+                child: Stack(
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    Container(
+                      height: 260, // Adjust the height as needed
+                      decoration: BoxDecoration(
+                        // border: Border(
+                        //   top: BorderSide(
+                        //     color: Color.fromARGB(255, 22, 4, 56),
+                        //     width: 0.5,
+                        //   ),
+                        // ),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                          bottomLeft: Radius.circular(20.0),
+                          bottomRight: Radius.circular(20.0),
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color.fromARGB(255, 128, 235, 215),
+                            Color.fromARGB(255, 57, 156, 138),
+                          ],
+                        ),
+                      ),
+                      padding: EdgeInsets.all(16.0),
+                      child: Row(
                         children: [
-                          SizedBox(height: 16),
-                          Text(
-                            ' Welcome to',
-                            style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              color:  Color.fromARGB(255, 241, 255, 251),
-                              letterSpacing: .5,
-                              fontSize: 28,
-                              )
-                            )
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(height: 10),
+                                Text(
+                                  ' Welcome to',
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Color.fromARGB(255, 241, 255, 251),
+                                      letterSpacing: .5,
+                                      fontSize: 28,
+                                    ),
+                                  ),
+                                ),
+                                Image.asset(
+                                  'assets/icons/app_icon2.png',
+                                  height: 32,
+                                  color: Color.fromARGB(255, 69, 185, 163),
+                                  colorBlendMode: BlendMode.difference,
+                                  fit: BoxFit.fill,
+                                ),
+                              ],
+                            ),
                           ),
                           Image.asset(
-                            'assets/icons/app_icon2.png',
-                            height: 32,
-                            color: Color.fromARGB(255, 69, 185, 163),
-                            colorBlendMode: BlendMode.difference,
-                            fit: BoxFit.fill,
+                            'assets/images/main_page_img.png',
+                            width: 100,
+                            height: 170,
+                            fit: BoxFit.cover,
                           ),
                         ],
                       ),
                     ),
-                    Image.asset(
-                      'assets/images/main_page_img.png',
-                      width: 140,
-                      height: 220,
-                      fit: BoxFit.cover,
-                    ),
+                    // Positioned.fill(
+                    //   child: CustomPaint(
+                    //     painter: BorderPainter(),
+                    //   ),
+                    // ),
                   ],
                 ),
-              ),
-              Positioned.fill(
-                  child: CustomPaint(
-                    painter: BorderPainter(),
-                  ),
-                ),
-        ]),
-          
-          ),
-          //SizedBox(height: 0),
-          Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              children: [
-                _buildGridItem(FontAwesomeIcons.userDoctor, 'Make Appointment', context, BookingPage(), color: Color.fromARGB(255, 38, 163, 143)),
-                _buildGridItem('assets/images/emergency.png', 'Emergency', context, CenterPage(), color: Color.fromARGB(255, 209, 23, 23), iconcolor: Color.fromARGB(255, 209, 23, 23)),
-                _buildGridItem(FontAwesomeIcons.calendarCheck, 'My Appointments', context, AppointmentsPage(), color: Color.fromARGB(255, 38, 163, 143)),
-              ],
+              //),
             ),
-          ),
-        ],
+            //SizedBox(height: 0),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: [
+                  _buildGridItem(FontAwesomeIcons.userDoctor, 'Make Appointment', context, BookingPage(), color: Color.fromARGB(255, 38, 163, 143)),
+                  _buildGridItem('assets/images/emergency.png', 'Emergency', context, CenterPage(), color: Color.fromARGB(255, 209, 23, 23), iconcolor: Color.fromARGB(255, 209, 23, 23)),
+                  _buildGridItem(FontAwesomeIcons.calendarCheck, 'My Appointments', context, AppointmentsPage(), color: Color.fromARGB(255, 38, 163, 143)),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
+    ]),
   );
 }
 
@@ -186,7 +237,8 @@ Widget _buildHomeContent(String userEmail) {
     return Container(
       //height: 150,
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 249, 247, 247),
+        //color: Color.fromARGB(255, 249, 247, 247),
+        color: Colors.grey[50],
         border: Border.all(color: Color.fromARGB(255, 2, 107, 77), width: .5),
         boxShadow: [
           // BoxShadow(
@@ -203,7 +255,8 @@ Widget _buildHomeContent(String userEmail) {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             elevation: 0.25,
-            backgroundColor: Color.fromARGB(255, 249, 255, 252),
+            //backgroundColor: Color.fromARGB(255, 249, 255, 252),
+            backgroundColor: Colors.grey[50],
             padding: EdgeInsets.all(11),
             minimumSize: Size(double.infinity, 50),
             shape: RoundedRectangleBorder(
