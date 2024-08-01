@@ -157,11 +157,11 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
                   width: 270,
                   height: 270,
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 179, 13, 68),
+                    color: Color.fromARGB(255, 171, 38, 19),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.pinkAccent.withOpacity(0.6),
+                        color: Colors.redAccent.withOpacity(0.6),
                         spreadRadius: 10,
                         blurRadius: 15,
                       ),
@@ -198,7 +198,7 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
               '\nKEEP CALM!\nAfter pressing the SOS button, we will have an ambulance at your location.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey,
+                color: Color.fromARGB(255, 22, 4, 56),
                 fontSize: 16,
               ),
             ),

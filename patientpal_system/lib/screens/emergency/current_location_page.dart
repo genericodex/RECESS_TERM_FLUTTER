@@ -148,9 +148,9 @@ class _LocationScreenState extends State<LocationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Emergency Location',
-        style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5)),
+        style: GoogleFonts.anuphan(textStyle: TextStyle(color: Colors.white, letterSpacing: .5)),
         ),
-        backgroundColor: Color.fromARGB(255, 176, 39, 24),
+        backgroundColor: Color.fromARGB(255, 171, 38, 19),
         foregroundColor: Colors.white,
       ),
       body: Stack(
@@ -217,7 +217,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.phone, color: Colors.red),
+                      Icon(Icons.phone, color: Color.fromARGB(255, 171, 38, 19)),
                       SizedBox(width: 5),
                       Text('+256 780 204837', style: TextStyle(color: Colors.black)),
                       Spacer(),
@@ -234,11 +234,11 @@ class _LocationScreenState extends State<LocationScreen> {
                           }
                         },
                         child: Text('CALL AMBULANCE',
-                            style: TextStyle(
+                            style: GoogleFonts.anuphan(
                               color: Colors.white,
                             )),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
+                          backgroundColor: Color.fromARGB(255, 171, 38, 19),
                         ),
                       ),
                     ],

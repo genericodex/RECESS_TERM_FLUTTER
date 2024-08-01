@@ -90,11 +90,62 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 Widget _buildHomeContent(String userEmail) {
   return Scaffold(
     backgroundColor: Colors.grey[50],
+    appBar: PreferredSize(
+      preferredSize: Size.fromHeight(63.0),
+      child: AppBar(
+        backgroundColor: Colors.grey[50],
+        flexibleSpace: FlexibleSpaceBar(
+          titlePadding: EdgeInsets.only(left: 19, bottom: 3,),
+          title: Align(
+            alignment: Alignment.bottomLeft,
+            // child: Padding(
+            //   padding: const EdgeInsets.all(14.0),
+              child: Text(
+                'Greetings!',
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
+                              fontSize: 23, // Adjust size as needed
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+              
+              ),
+            //),
+          ),
+        ),
+      
+        // leading: Padding(
+        //   padding:const EdgeInsets.only(left: 20.0),
+        //   child: Center(
+        //     child: Text(
+        //             'Greetings!',
+        //             style: GoogleFonts.poppins(
+        //               textStyle: TextStyle(
+        //                 color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
+        //                 fontSize: 23, // Adjust size as needed
+        //                 fontWeight: FontWeight.bold,
+        //               ),
+        //             ),
+        //     ),
+        //   ),            
+        // ),
+        //title: Center(
+          // child: Image.asset(
+          //   'assets/icons/iconlogo.png',
+          //   height: 30,
+          //   color: Color.fromARGB(255, 62, 189, 166),
+          //   colorBlendMode: BlendMode.difference
+            
+          //),
+        //),
+      ),
+    ),
     body: Stack(
       children:[
-        Container(
-          height: 150,
-          color: Colors.grey[50],),
+        // Container(
+        //   height: 150,
+        //   color: Colors.grey[50],),
       SingleChildScrollView(
         child: Column(
           children: [
@@ -110,26 +161,27 @@ Widget _buildHomeContent(String userEmail) {
             //   ),
             // ),
             //Container(
-            SizedBox(height: 60),
+            //SizedBox(height: 60),
+            SizedBox(height: 5),
               //height: 60,
               //color: Colors.blue),
-                 Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 18.0),
-                child: Text(
-                  'Greetings!',
-                  style: GoogleFonts.poppins(
-                    textStyle: TextStyle(
-                      color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
-                      fontSize: 24, // Adjust size as needed
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 10,),
+            //      Align(
+            //   alignment: Alignment.topLeft,
+            //   child: Padding(
+            //     padding: const EdgeInsets.only(left: 20.0),
+                // child: Text(
+                //   'Greetings!',
+                //   style: GoogleFonts.poppins(
+                //     textStyle: TextStyle(
+                //       color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
+                //       fontSize: 21, // Adjust size as needed
+                //       fontWeight: FontWeight.bold,
+                //     ),
+                //   ),
+                // ),
+            //   ),
+            // ),
+            SizedBox(height: 5,),
             
             Padding(
               padding: const EdgeInsets.only(left:10.0, right:10.0),
@@ -208,9 +260,9 @@ Widget _buildHomeContent(String userEmail) {
                 ),
               //),
             ),
-            //SizedBox(height: 0),
+            SizedBox(height: 25),
             Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(12.0),
               child: GridView.count(
                 shrinkWrap: true,
                 crossAxisCount: 2,
@@ -251,14 +303,14 @@ Widget _buildHomeContent(String userEmail) {
         borderRadius: BorderRadius.circular(12),
       ),
       child: SizedBox(
-        height: 50,
+        height: 40,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             elevation: 0.25,
             //backgroundColor: Color.fromARGB(255, 249, 255, 252),
             backgroundColor: Colors.grey[50],
             padding: EdgeInsets.all(11),
-            minimumSize: Size(double.infinity, 50),
+            //minimumSize: Size(double.infinity, 50),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -291,7 +343,7 @@ Widget _buildHomeContent(String userEmail) {
                 title,
                 style: GoogleFonts.cairo(
               textStyle: TextStyle(
-                fontSize: 15, fontWeight: FontWeight.bold, color: color
+                fontSize: 15, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 22, 4, 56)
                 )
               ),
               ),

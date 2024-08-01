@@ -82,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         title: Text(
           'My Profile',
-          style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5)),
+          style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5), fontWeight: FontWeight.bold),
         ),
         backgroundColor: Color.fromARGB(255, 24, 176, 151),
         foregroundColor: Colors.white,
@@ -219,7 +219,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     child: Text(
                       'Update Profile',
-                      style: TextStyle(fontSize: 18),
+                      style: GoogleFonts.anuphan(textStyle: TextStyle(fontSize: 18)),
                     ),
                   ),
                 ],
