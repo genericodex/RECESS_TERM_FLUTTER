@@ -104,6 +104,57 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 Widget _buildHomeContent(String userEmail) {
   return Scaffold(
     backgroundColor: Colors.grey[50],
+    appBar: PreferredSize(
+      preferredSize: Size.fromHeight(63.0),
+      child: AppBar(
+        backgroundColor: Colors.grey[50],
+        flexibleSpace: FlexibleSpaceBar(
+          titlePadding: EdgeInsets.only(left: 19, bottom: 3,),
+          title: Align(
+            alignment: Alignment.bottomLeft,
+            // child: Padding(
+            //   padding: const EdgeInsets.all(14.0),
+              child: Text(
+                'Greetings!',
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
+                              fontSize: 23, // Adjust size as needed
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+              
+              ),
+            //),
+          ),
+        ),
+      
+        // leading: Padding(
+        //   padding:const EdgeInsets.only(left: 20.0),
+        //   child: Center(
+        //     child: Text(
+        //             'Greetings!',
+        //             style: GoogleFonts.poppins(
+        //               textStyle: TextStyle(
+        //                 color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
+        //                 fontSize: 23, // Adjust size as needed
+        //                 fontWeight: FontWeight.bold,
+        //               ),
+        //             ),
+        //     ),
+        //   ),            
+        // ),
+        //title: Center(
+          // child: Image.asset(
+          //   'assets/icons/iconlogo.png',
+          //   height: 30,
+          //   color: Color.fromARGB(255, 62, 189, 166),
+          //   colorBlendMode: BlendMode.difference
+            
+          //),
+        //),
+      ),
+    ),
     body: Stack(
       children:[
         Container(

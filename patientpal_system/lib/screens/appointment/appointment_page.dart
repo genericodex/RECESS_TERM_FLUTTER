@@ -35,27 +35,27 @@ class AppointmentsPage extends StatelessWidget {
     String formattedDate = timestamp != null ? DateFormat('MMMM d, yyyy').format(timestamp.toDate()) : 'Unknown Date';
 
     return Card(
-      color: Color.fromARGB(255, 244, 255, 252),
+      color: Colors.grey[50],
       elevation: 0,
       margin: EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(color: Color.fromARGB(65, 0, 150, 135), width: 1.0),
+        borderRadius: BorderRadius.circular(15.0),
+        side: BorderSide(color: Color.fromARGB(255, 2, 107, 77), width: .5),
       ),
       child: ListTile(
         contentPadding: EdgeInsets.all(11.0),
         leading: Icon(
-          FontAwesomeIcons.calendarAlt,
-          color: Colors.teal,
-          size: 40,
+          FontAwesomeIcons.calendarCheck,
+          color: Color.fromARGB(255, 38, 163, 143),
+          size: 50,
         ),
         title: Text(
           dateTime != null ? 'Appointment on $day $formattedDate at $dateTime' : 'Appointment date not set',
           style: GoogleFonts.anuphan(
             textStyle: TextStyle(
-              color: const Color.fromARGB(255, 1, 44, 40), 
+              color: const Color.fromARGB(255, 22, 4, 56), 
               letterSpacing: .5,
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold)),
         ),
         subtitle: Column(
@@ -64,23 +64,23 @@ class AppointmentsPage extends StatelessWidget {
             SizedBox(height: 8.0),
             Text(
               'Ailment: $ailmentType',
-              style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.teal, letterSpacing: .5,fontSize: 16)),
+              style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 38, 163, 143), letterSpacing: .5,fontSize: 16)),
             ),
             SizedBox(height: 4.0),
             Text(
               'Doctor: $doctorName',
-              style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.teal, letterSpacing: .5,fontSize: 16)),
+              style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 38, 163, 143), letterSpacing: .5,fontSize: 16)),
             ),
             SizedBox(height: 4.0),
             Text(
               status ? 'Status: Booked' : 'Status: Available',
-              style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 92, 116, 108), letterSpacing: .5,fontSize: 16)),
+              style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 133, 134, 136), letterSpacing: .5,fontSize: 14)),
             ),
           ],
         ),
         trailing: IconButton(
           icon: Icon(Icons.cancel),
-          color: Colors.red,
+          color: Color.fromARGB(255, 171, 38, 19),
           onPressed: () async {
             await _cancelAppointment(context, appointmentId);
           },
@@ -125,12 +125,12 @@ class AppointmentsPage extends StatelessWidget {
     final user = context.watch<AuthProvider>().user;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 24, 176, 161),
-        title: Text('My Appointments', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
+        backgroundColor: Color.fromARGB(255, 38, 163, 143),
+        title: Text('My Appointments', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5, fontWeight:FontWeight.bold))),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back_rounded, color: Colors.white),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,

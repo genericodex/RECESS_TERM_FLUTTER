@@ -202,9 +202,9 @@ class _BookingPageState extends State<BookingPage> {
         decoration: BoxDecoration(
           border: Border.all(
             color: isSelected ? Color.fromARGB(255, 3, 71, 48) : Color.fromARGB(255, 229, 228, 228),
-            width: 2.0,
+            width: 1,
           ),
-          color: isSelected ? Color.fromARGB(255, 2, 99, 75) : Colors.white,
+          color: isSelected ? Color.fromARGB(255, 57, 156, 138) : Colors.grey[50],
           borderRadius: BorderRadius.circular(36.0),
         ),
         child: Center(
@@ -214,7 +214,7 @@ class _BookingPageState extends State<BookingPage> {
               day,
               style: GoogleFonts.poppins(
                 textStyle: TextStyle(
-                  color: isSelected ? Color.fromARGB(255, 184, 247, 226) : Color.fromARGB(255, 1, 136, 102),
+                  color: isSelected ? Color.fromARGB(255, 184, 247, 226) : Color.fromARGB(255, 22, 4, 56),
                   letterSpacing: .5,
                   fontSize: 15,
                 ),
@@ -229,7 +229,7 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -242,10 +242,10 @@ class _BookingPageState extends State<BookingPage> {
           },
         ),
         title: Text(
-          'Book an Appointment',
-          style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5)),
+          'Make Appointment',
+          style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5, fontWeight: FontWeight.bold)),
         ),
-        backgroundColor: Color.fromARGB(255, 24, 176, 151),
+        backgroundColor: Color.fromARGB(255, 38, 163, 143),
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -255,11 +255,12 @@ class _BookingPageState extends State<BookingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Select Ailment Type',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.anuphan(
                     textStyle: TextStyle(
-                      color: Colors.black,
+                      color: Color.fromARGB(255, 22, 4, 56),
                       letterSpacing: .5,
                       fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   )),
               SizedBox(height: 8),
@@ -287,11 +288,12 @@ class _BookingPageState extends State<BookingPage> {
               ),
               SizedBox(height: 16),
               Text('Select Work Day',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.anuphan(
                     textStyle: TextStyle(
-                      color: Colors.black,
+                      color: Color.fromARGB(255, 22, 4, 56),
                       letterSpacing: .5,
                       fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   )),
               SizedBox(height: 8),
@@ -299,7 +301,7 @@ class _BookingPageState extends State<BookingPage> {
                   ? Center(
                       child: Text(
                         'Please select an ailment type.',
-                        style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.black, letterSpacing: .5)),
+                        style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 57, 156, 138), letterSpacing: .5)),
                       ),
                     )
                   : SizedBox(
@@ -324,18 +326,19 @@ class _BookingPageState extends State<BookingPage> {
                     ),
               SizedBox(height: 16),
               Text('Select Time',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.anuphan(
                     textStyle: TextStyle(
-                      color: Colors.black,
+                      color: Color.fromARGB(255, 22, 4, 56),
                       letterSpacing: .5,
                       fontSize: 21,
+                      fontWeight: FontWeight.bold,
                     ),
                   )),
               _availableTimeSlots.isEmpty
                   ? Center(
                       child: Text(
                         'Please select a work day.',
-                        style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.black, letterSpacing: .5)),
+                        style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 57, 156, 138), letterSpacing: .5)),
                       ),
                     )
                   : SizedBox(
@@ -358,10 +361,10 @@ class _BookingPageState extends State<BookingPage> {
                                     color: _selectedTimeSlot == slot['time']
                                         ? Color.fromARGB(255, 3, 71, 48)
                                         : Color.fromARGB(255, 229, 228, 228),
-                                    width: 2.0,
+                                    width: 1,
                                   ),
                                   color: _selectedTimeSlot == slot['time']
-                                      ? Color.fromARGB(255, 2, 85, 64)
+                                      ? Color.fromARGB(255, 57, 156, 138)
                                       : Colors.white,
                                   borderRadius: BorderRadius.circular(25.0),
                                 ),
@@ -424,7 +427,7 @@ class _BookingPageState extends State<BookingPage> {
                 child: ElevatedButton(
                   onPressed: _bookAppointment,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 2, 85, 64),
+                    backgroundColor: Color.fromARGB(255, 57, 156, 138),
                     foregroundColor: Colors.white,
                     elevation: 3.0,
                     padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
@@ -440,11 +443,11 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                   child: Text(
                     'Book Appointment',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.anuphan(
                       textStyle: TextStyle(
-                        color: Color.fromARGB(255, 184, 247, 226),
+                        color: Colors.grey[50],
                         letterSpacing: .5,
-                        fontSize: 15,
+                        fontSize: 16,
                       ),
                     ),
                   ),

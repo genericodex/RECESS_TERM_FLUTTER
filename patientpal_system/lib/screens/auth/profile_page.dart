@@ -82,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         title: Text(
           'My Profile',
-          style: GoogleFonts.poppins(textStyle: const TextStyle(color: Colors.white, letterSpacing: .5)),
+          style: GoogleFonts.poppins(textStyle: const TextStyle(color: Colors.white, letterSpacing: .5), fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color.fromARGB(255, 24, 176, 151),
         foregroundColor: Colors.white,
