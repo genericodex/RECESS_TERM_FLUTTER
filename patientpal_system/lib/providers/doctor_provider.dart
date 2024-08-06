@@ -6,6 +6,7 @@ class DoctorProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> registerDoctor(String uid, String name, String department, Map<String, String> workHours, List<String> workDays) async {
+    // ignore: unused_local_variable
     DocumentReference docRef = await _firestore.collection('doctors').add({
       'name': name,
       // 'uid': uid,

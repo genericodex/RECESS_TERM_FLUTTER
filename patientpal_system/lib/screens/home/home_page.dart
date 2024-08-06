@@ -1,19 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:patientpal_system/screens/appointment/notifications.dart';
-import 'package:ionicons/ionicons.dart';
+// import 'package:ionicons/ionicons.dart';
 import 'package:patientpal_system/screens/appointment/create_appointment_page.dart';
 import 'package:patientpal_system/screens/auth/profile_page.dart';
-import 'package:patientpal_system/screens/doctor/doctor_registration_page.dart';
+// import 'package:patientpal_system/screens/doctor/doctor_registration_page.dart';
 import 'package:patientpal_system/screens/emergency/emergency_location_page.dart';
 import 'package:provider/provider.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
 import 'package:patientpal_system/screens/appointment/appointment_page.dart';
-import 'clipper.dart';
+// import 'clipper.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -22,6 +23,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   MotionTabBarController? _motionTabBarController;
+  String? userFirstName;
 
   @override
   void initState() {
@@ -31,12 +33,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       length: 4,
       vsync: this,
     );
+    _fetchUserData();
   }
 
   @override
   void dispose() {
     _motionTabBarController!.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchUserData() async {
+    final authProvider = context.read<AuthProvider>();
+    final user = authProvider.user;
+    if (user != null) {
+      final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      setState(() {
+        userFirstName = userData['firstName'];
+      });
+    }
   }
 
   @override
@@ -118,7 +132,7 @@ Widget _buildHomeContent(String userEmail) {
               child: Padding(
                 padding: const EdgeInsets.only(left: 18.0),
                 child: Text(
-                  'Greetings!',
+                  'Greetings, ${userFirstName ?? userEmail}!',
                   style: GoogleFonts.poppins(
                     textStyle: TextStyle(
                       color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
@@ -255,8 +269,8 @@ Widget _buildHomeContent(String userEmail) {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             elevation: 0.25,
-            //backgroundColor: Color.fromARGB(255, 249, 255, 252),
-            backgroundColor: Colors.grey[50],
+            // backgroundColor: Color.fromARGB(255, 249, 255, 252),
+            backgroundColor: Color.fromARGB(255, 239, 255, 251),
             padding: EdgeInsets.all(11),
             minimumSize: Size(double.infinity, 50),
             shape: RoundedRectangleBorder(
@@ -289,7 +303,7 @@ Widget _buildHomeContent(String userEmail) {
               SizedBox(height: 8),
               Text(
                 title,
-                style: GoogleFonts.cairo(
+                style: GoogleFonts.montserrat(
               textStyle: TextStyle(
                 fontSize: 15, fontWeight: FontWeight.bold, color: color
                 )
