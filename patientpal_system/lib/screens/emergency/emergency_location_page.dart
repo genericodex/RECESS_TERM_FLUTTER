@@ -83,7 +83,7 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
 
         // Send SMS
         String message = 'Emergency reported! Send help to patient at location:(https://www.google.com/maps/search/?api=1&query=${position.latitude},${position.longitude}).';
-        List<String> recipients = ['+256765813705']; // Add emergency contact numbers here
+        List<String> recipients = ['+256705642691']; // Add emergency contact numbers here
         await _sendSMS(message, recipients);
 
         // Navigate to the location screen
@@ -129,10 +129,10 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 143, 38, 68),
-        title: Text('SOS Emergency', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
+        backgroundColor: Colors.white,
+        //title: Text('SOS Emergency', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.grey),
           onPressed: () {
             Navigator.pop(context);
           },

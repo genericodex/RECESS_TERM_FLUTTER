@@ -1,20 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:patientpal_system/screens/appointment/notifications.dart';
-// import 'package:ionicons/ionicons.dart';
+//import 'package:ionicons/ionicons.dart';
 import 'package:patientpal_system/screens/appointment/create_appointment_page.dart';
 import 'package:patientpal_system/screens/auth/profile_page.dart';
-// import 'package:patientpal_system/screens/doctor/doctor_registration_page.dart';
+import 'package:patientpal_system/screens/doctor/doctor_registration_page.dart';
 import 'package:patientpal_system/screens/emergency/emergency_location_page.dart';
 import 'package:provider/provider.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
 import 'package:patientpal_system/screens/appointment/appointment_page.dart';
-// import 'clipper.dart';
+import 'clipper.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -42,6 +42,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  // To retrieve the user's name in the greeting
   Future<void> _fetchUserData() async {
     final authProvider = context.read<AuthProvider>();
     final user = authProvider.user;
@@ -94,6 +95,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ProfilePage(),
           _buildHomeContent(userEmail),
           NotificationsPage(),
+          //AppointmentReminderPage(),
           
         ],
       ),
@@ -115,7 +117,7 @@ Widget _buildHomeContent(String userEmail) {
             // child: Padding(
             //   padding: const EdgeInsets.all(14.0),
               child: Text(
-                'Greetings!',
+                'Greetings, ${userFirstName ?? 'Guest'}!',
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
                               color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
@@ -157,9 +159,9 @@ Widget _buildHomeContent(String userEmail) {
     ),
     body: Stack(
       children:[
-        Container(
-          height: 150,
-          color: Colors.grey[50],),
+        // Container(
+        //   height: 150,
+        //   color: Colors.grey[50],),
       SingleChildScrollView(
         child: Column(
           children: [
@@ -175,26 +177,27 @@ Widget _buildHomeContent(String userEmail) {
             //   ),
             // ),
             //Container(
-            SizedBox(height: 60),
+            //SizedBox(height: 60),
+            SizedBox(height: 5),
               //height: 60,
               //color: Colors.blue),
-                 Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 18.0),
-                child: Text(
-                  'Greetings, ${userFirstName ?? userEmail}!',
-                  style: GoogleFonts.poppins(
-                    textStyle: TextStyle(
-                      color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
-                      fontSize: 24, // Adjust size as needed
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 10,),
+            //      Align(
+            //   alignment: Alignment.topLeft,
+            //   child: Padding(
+            //     padding: const EdgeInsets.only(left: 20.0),
+                // child: Text(
+                //   'Greetings!',
+                //   style: GoogleFonts.poppins(
+                //     textStyle: TextStyle(
+                //       color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
+                //       fontSize: 21, // Adjust size as needed
+                //       fontWeight: FontWeight.bold,
+                //     ),
+                //   ),
+                // ),
+            //   ),
+            // ),
+            SizedBox(height: 5,),
             
             Padding(
               padding: const EdgeInsets.only(left:10.0, right:10.0),
@@ -273,9 +276,9 @@ Widget _buildHomeContent(String userEmail) {
                 ),
               //),
             ),
-            //SizedBox(height: 0),
+            SizedBox(height: 25),
             Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(12.0),
               child: GridView.count(
                 shrinkWrap: true,
                 crossAxisCount: 2,
@@ -316,14 +319,14 @@ Widget _buildHomeContent(String userEmail) {
         borderRadius: BorderRadius.circular(12),
       ),
       child: SizedBox(
-        height: 50,
+        height: 40,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             elevation: 0.25,
-            // backgroundColor: Color.fromARGB(255, 249, 255, 252),
-            backgroundColor: Color.fromARGB(255, 239, 255, 251),
+            //backgroundColor: Color.fromARGB(255, 249, 255, 252),
+            backgroundColor: Colors.grey[50],
             padding: EdgeInsets.all(11),
-            minimumSize: Size(double.infinity, 50),
+            //minimumSize: Size(double.infinity, 50),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -354,9 +357,9 @@ Widget _buildHomeContent(String userEmail) {
               SizedBox(height: 8),
               Text(
                 title,
-                style: GoogleFonts.montserrat(
+                style: GoogleFonts.cairo(
               textStyle: TextStyle(
-                fontSize: 15, fontWeight: FontWeight.bold, color: color
+                fontSize: 15, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 22, 4, 56)
                 )
               ),
               ),

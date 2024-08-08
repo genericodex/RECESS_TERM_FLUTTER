@@ -71,7 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
@@ -82,26 +82,26 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         title: Text(
           'My Profile',
-          style: GoogleFonts.poppins(textStyle: const TextStyle(color: Colors.white, letterSpacing: .5), fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5), fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color.fromARGB(255, 24, 176, 151),
+        backgroundColor: Color.fromARGB(255, 24, 176, 151),
         foregroundColor: Colors.white,
       ),
       body: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              // color: Colors.grey[50],
-              gradient: LinearGradient(
-                colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 215, 255, 245)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              // gradient: LinearGradient(
+              //   colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 199, 255, 241)],
+              //   begin: Alignment.topCenter,
+              //   end: Alignment.bottomCenter,
+              // ),
             ),
           ),
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   Center(
@@ -111,13 +111,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           radius: 60,
                           backgroundImage: _image != null
                               ? FileImage(_image!)
-                              : const AssetImage('assets/images/default.jpeg') as ImageProvider,
+                              : AssetImage('assets/images/default.jpeg') as ImageProvider,
                         ),
                         Positioned(
                           bottom: 0,
                           right: 0,
                           child: IconButton(
-                            icon: const Icon(Icons.camera_alt, color: Colors.grey),
+                            icon: Icon(Icons.camera_alt, color: Colors.grey),
                             onPressed: _pickImage,
                             color: const Color.fromARGB(255, 33, 243, 170),
                             iconSize: 30,
@@ -126,112 +126,100 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Container(
-                    width: 300,
-                    child: TextField(
-                      controller: _firstNameController,
-                      decoration: InputDecoration(
-                        labelText: 'First Name',
-                        labelStyle: const TextStyle(color: Colors.black),
-                        prefixIcon: const Icon(Icons.person, color: Colors.black),
-                        filled: true,
-                        fillColor: Color.fromARGB(255, 112, 255, 210).withOpacity(0.2),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color.fromARGB(255, 1, 59, 47)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
-                        ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _firstNameController,
+                    decoration: InputDecoration(
+                      labelText: 'First Name',
+                      labelStyle: TextStyle(color: Colors.black),
+                      prefixIcon: Icon(Icons.person, color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.2),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 1, 59, 47)),
                       ),
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    width: 300,
-                    child: TextField(
-                      controller: _lastNameController,
-                      decoration: InputDecoration(
-                        labelText: 'Last Name',
-                        labelStyle: const TextStyle(color: Colors.black),
-                        prefixIcon: const Icon(Icons.person, color: Colors.black),
-                        filled: true,
-                        fillColor: Color.fromARGB(255, 112, 255, 210).withOpacity(0.2),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
-                        ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
                       ),
-                      style: const TextStyle(color: Colors.black),
                     ),
+                    style: TextStyle(color: Colors.black),
                   ),
-                  const SizedBox(height: 20),
-                  Container(
-                    width: 300,
-                    child: TextField(
-                      controller: _phoneController,
-                      decoration: InputDecoration(
-                        labelText: 'Emergency Number',
-                        labelStyle: const TextStyle(color: Colors.black),
-                        prefixIcon: const Icon(Icons.phone, color: Colors.black),
-                        filled: true,
-                        fillColor: Color.fromARGB(255, 112, 255, 210).withOpacity(0.2),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
-                        ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _lastNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Last Name',
+                      labelStyle: TextStyle(color: Colors.black),
+                      prefixIcon: Icon(Icons.person, color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.2),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Colors.black),
                       ),
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  Container(
-                    width: 300,
-                    child: TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        labelStyle: const TextStyle(color: Colors.black),
-                        prefixIcon: const Icon(Icons.phone, color: Colors.black),
-                        filled: true,
-                        fillColor: Color.fromARGB(255, 112, 255, 210).withOpacity(0.2),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
-                        ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
                       ),
-                      style: const TextStyle(color: Colors.black),
                     ),
+                    style: TextStyle(color: Colors.black),
                   ),
-                  const SizedBox(height: 30),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _phoneController,
+                    decoration: InputDecoration(
+                      labelText: 'Emergency Number',
+                      labelStyle: TextStyle(color: Colors.black),
+                      prefixIcon: Icon(Icons.phone, color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.2),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
+                      ),
+                    ),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  SizedBox(height: 30),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      labelStyle: TextStyle(color: Colors.black),
+                      prefixIcon: Icon(Icons.phone, color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.2),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Color.fromARGB(255, 5, 172, 138)),
+                      ),
+                    ),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: _updateUserData,
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white, 
-                      backgroundColor: const Color.fromARGB(255, 57, 156, 138),
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      backgroundColor: Color.fromARGB(255, 57, 156, 138),
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Update Profile',
-                      style: TextStyle(fontSize: 18),
+                      style: GoogleFonts.anuphan(textStyle: TextStyle(fontSize: 18)),
                     ),
                   ),
                 ],
