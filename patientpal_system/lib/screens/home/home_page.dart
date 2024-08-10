@@ -117,7 +117,7 @@ Widget _buildHomeContent(String userEmail) {
             // child: Padding(
             //   padding: const EdgeInsets.all(14.0),
               child: Text(
-                'Greetings, ${userFirstName ?? 'Guest'}!',
+                'Greetings, ${userFirstName ?? userEmail}!',
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
                               color: Color.fromARGB(255, 22, 4, 56), // Adjust color as needed
