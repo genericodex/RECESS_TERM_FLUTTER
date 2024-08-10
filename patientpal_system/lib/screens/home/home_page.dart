@@ -4,17 +4,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:patientpal_system/screens/appointment/notifications.dart';
-//import 'package:ionicons/ionicons.dart';
 import 'package:patientpal_system/screens/appointment/create_appointment_page.dart';
 import 'package:patientpal_system/screens/auth/profile_page.dart';
-import 'package:patientpal_system/screens/doctor/doctor_registration_page.dart';
 import 'package:patientpal_system/screens/emergency/emergency_location_page.dart';
 import 'package:provider/provider.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
 import 'package:patientpal_system/screens/appointment/appointment_page.dart';
-import 'clipper.dart';
 
 class HomePage extends StatefulWidget {
   @override
