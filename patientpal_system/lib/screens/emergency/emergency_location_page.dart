@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -132,7 +132,7 @@ class _CenterPageState extends State<CenterPage> with SingleTickerProviderStateM
         backgroundColor: Colors.white,
         //title: Text('SOS Emergency', style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, letterSpacing: .5))),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.grey),
+          icon: Icon(Icons.arrow_back, color: Color.fromARGB(255, 148, 3, 3)),
           onPressed: () {
             Navigator.pop(context);
           },
