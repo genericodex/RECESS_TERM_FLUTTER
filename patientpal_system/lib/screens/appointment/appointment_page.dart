@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:patientpal_system/screens/appointment/appointment_details.dart';
 import 'package:patientpal_system/screens/home/home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
@@ -42,48 +43,58 @@ class AppointmentsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(15.0),
         side: BorderSide(color: Color.fromARGB(255, 2, 107, 77), width: .5),
       ),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(11.0),
-        leading: Icon(
-          FontAwesomeIcons.calendarCheck,
-          color: Color.fromARGB(255, 38, 163, 143),
-          size: 50,
-        ),
-        title: Text(
-          dateTime != null ? 'Appointment on $day $formattedDate at $dateTime' : 'Appointment date not set',
-          style: GoogleFonts.anuphan(
-            textStyle: TextStyle(
-              color: const Color.fromARGB(255, 22, 4, 56), 
-              letterSpacing: .5,
-              fontSize: 18,
-              fontWeight: FontWeight.bold)),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 8.0),
-            Text(
-              'Ailment: $ailmentType',
-              style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 38, 163, 143), letterSpacing: .5,fontSize: 16)),
-            ),
-            SizedBox(height: 4.0),
-            Text(
-              'Doctor: $doctorName',
-              style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 38, 163, 143), letterSpacing: .5,fontSize: 16)),
-            ),
-            SizedBox(height: 4.0),
-            Text(
-              status ? 'Status: Booked' : 'Status: Available',
-              style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 133, 134, 136), letterSpacing: .5,fontSize: 14)),
-            ),
-          ],
-        ),
-        trailing: IconButton(
-          icon: Icon(Icons.cancel),
-          color: Color.fromARGB(255, 171, 38, 19),
-          onPressed: () async {
-            await _cancelAppointment(context, appointmentId);
-          },
+      child: GestureDetector(
+        onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AppointmentDetailsPage(appointmentId: appointmentId),
+          ),
+        );
+      },
+        child: ListTile(
+          contentPadding: EdgeInsets.all(11.0),
+          leading: Icon(
+            FontAwesomeIcons.calendarCheck,
+            color: Color.fromARGB(255, 38, 163, 143),
+            size: 50,
+          ),
+          title: Text(
+            dateTime != null ? 'Appointment on $day $formattedDate at $dateTime' : 'Appointment date not set',
+            style: GoogleFonts.anuphan(
+              textStyle: TextStyle(
+                color: const Color.fromARGB(255, 22, 4, 56), 
+                letterSpacing: .5,
+                fontSize: 18,
+                fontWeight: FontWeight.bold)),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 8.0),
+              Text(
+                'Ailment: $ailmentType',
+                style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 38, 163, 143), letterSpacing: .5,fontSize: 16)),
+              ),
+              SizedBox(height: 4.0),
+              Text(
+                'Doctor: $doctorName',
+                style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 38, 163, 143), letterSpacing: .5,fontSize: 16)),
+              ),
+              SizedBox(height: 4.0),
+              Text(
+                status ? 'Status: Booked' : 'Status: Available',
+                style: GoogleFonts.poppins(textStyle: TextStyle(color: Color.fromARGB(255, 133, 134, 136), letterSpacing: .5,fontSize: 14)),
+              ),
+            ],
+          ),
+          trailing: IconButton(
+            icon: Icon(Icons.cancel),
+            color: Color.fromARGB(255, 171, 38, 19),
+            onPressed: () async {
+              await _cancelAppointment(context, appointmentId);
+            },
+          ),
         ),
       ),
     );

@@ -1,128 +1,135 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:patientpal_system/main.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+
+Future<void> scheduleNotification({
+  required DateTime appointmentDate,
+  required String doctorName,
+  required String timeSlot,
+}) async {
+    final scheduledDate = tz.TZDateTime.from(appointmentDate.subtract(Duration(days: 1)), tz.local);
+
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'appointment_channel_id',
+      'Appointment Reminders',
+      channelDescription: 'Channel for appointment reminders',
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: true,
+    );
+
+    const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      0,
+      'Upcoming Reminder',
+      'You have an appointment with Dr. $doctorName on ${DateFormat('MMMM d, yyyy').format(appointmentDate)} at $timeSlot.',
+      scheduledDate,
+      platformDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dateAndTime,
+    );
+  }
+
 
 class NotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text(
-          'You have no notifications right now',
-          style: TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
+      appBar: AppBar(
+        title: Text(
+          'Notifications',
+          style: GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      letterSpacing: .5,
+                      fontSize: 21,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
           ),
-        ),
+        backgroundColor: Color.fromARGB(255, 38, 163, 143),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('notifications').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'You have no notifications right now',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 22, 4, 56),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return ListView(
+            padding: EdgeInsets.all(16.0),
+            children: snapshot.data!.docs.map((doc) {
+              DateTime timestamp = doc['timestamp'].toDate();
+              return Card(
+                color: Color.fromARGB(255, 240, 255, 248),
+                elevation: 2,
+                shadowColor: Color.fromARGB(125, 25, 229, 113),
+                margin: EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(16.0),
+                  title: Text(
+                    doc['title'],
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    doc['body'],
+                    style: TextStyle(
+                      fontSize: 14.0,
+                    ),
+                  ),
+                  trailing: Text(
+                    DateFormat('MMM d, yyyy - h:mm a').format(timestamp),
+                    style: TextStyle(
+                      fontSize: 12.0,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          );
+        },
       ),
     );
   }
 }
 
 
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:provider/provider.dart';
-// import 'package:patientpal_system/providers/auth_provider.dart';
+Future<void> saveNotification(String title, String body) async {
+  await FirebaseFirestore.instance.collection('notifications').add({
+    'title': title,
+    'body': body,
+    'timestamp': FieldValue.serverTimestamp(),
+  });
+}
 
-// class NotificationService {
-//   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-//   Future<void> initialize() async {
-//     const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
-
-//     final InitializationSettings initializationSettings = InitializationSettings(
-//       android: initializationSettingsAndroid,
-//     );
-
-//     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-//   }
-
-//   Future<void> scheduleNotification(DateTime scheduledDate, String title, String body, int id) async {
-//     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-//       'appointment_reminder_channel',
-//       'Appointment Reminders',
-//       channelDescription: 'Channel for appointment reminders',
-//       importance: Importance.max,
-//       priority: Priority.high,
-//       showWhen: true,
-//     );
-
-//     const NotificationDetails platformChannelSpecifics = NotificationDetails(
-//       android: androidPlatformChannelSpecifics,
-//     );
-
-//     await flutterLocalNotificationsPlugin.zonedSchedule(
-//       id,
-//       title,
-//       body,
-//       scheduledDate,
-//       platformChannelSpecifics,
-//       androidAllowWhileIdle: true,
-//       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-//     );
-//   }
-// }
-
-// class AppointmentReminderPage extends StatefulWidget {
-//   @override
-//   _AppointmentReminderPageState createState() => _AppointmentReminderPageState();
-// }
-
-// class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
-//   final NotificationService _notificationService = NotificationService();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _notificationService.initialize();
-//     _scheduleUpcomingAppointmentsNotifications();
-//   }
-
-//   Future<void> _scheduleUpcomingAppointmentsNotifications() async {
-//     final user = context.read<AuthProvider>().user;
-
-//     if (user != null) {
-//       FirebaseFirestore.instance
-//           .collection('appointments')
-//           .where('patient_id', isEqualTo: user.uid)
-//           .where('isBooked', isEqualTo: true)
-//           .snapshots()
-//           .listen((snapshot) {
-//         for (var doc in snapshot.docs) {
-//           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-//           Timestamp appointmentTimestamp = data['date'];
-//           DateTime appointmentDate = appointmentTimestamp.toDate();
-//           String timeSlot = data['timeSlot'];
-//           String doctorId = data['doctorId'];
-
-//           _scheduleNotificationForAppointment(appointmentDate, timeSlot, doctorId, doc.id);
-//         }
-//       });
-//     }
-//   }
-
-//   Future<void> _scheduleNotificationForAppointment(DateTime appointmentDate, String timeSlot, String doctorId, String appointmentId) async {
-//     DateTime scheduledNotificationDate = appointmentDate.subtract(Duration(minutes: 30));
-
-//     // Fetch doctor's name for the notification body
-//     DocumentSnapshot doctorSnapshot = await FirebaseFirestore.instance.collection('doctors').doc(doctorId).get();
-//     String doctorName = doctorSnapshot.exists ? doctorSnapshot['name'] : 'Your doctor';
-
-//     String notificationTitle = 'Upcoming Appointment';
-//     String notificationBody = 'You have an appointment with Dr. $doctorName at $timeSlot.';
-
-//     int notificationId = int.parse(appointmentId.hashCode.toString().substring(0, 6));
-//     _notificationService.scheduleNotification(scheduledNotificationDate, notificationTitle, notificationBody, notificationId);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Appointment Reminders'),
-//       ),
-//       body: Center(
-//         child: Text('Notifications will remind you of your upcoming appointments.'),
-//       ),
-//     );
-//   }
-// }

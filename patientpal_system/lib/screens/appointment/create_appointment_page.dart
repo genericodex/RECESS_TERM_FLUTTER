@@ -1,11 +1,20 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
+import 'package:patientpal_system/screens/appointment/notifications.dart';
 import 'package:patientpal_system/screens/home/home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart'; // Added for date formatting and manipulation
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'; // Import for notifications
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
+
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 class BookingPage extends StatefulWidget {
   @override
   _BookingPageState createState() => _BookingPageState();
@@ -143,23 +152,88 @@ class _BookingPageState extends State<BookingPage> {
   return now.add(Duration(days: daysUntilNext));
 }
 
+Future<void> _scheduleNotification({
+  required DateTime appointmentDate,
+  required String doctorName,
+  required String timeSlot,
+}) async {
+    final scheduledDate = tz.TZDateTime.from(appointmentDate.subtract(Duration(days: 1)), tz.local);
+
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'appointment_channel_id',
+      'Appointment Reminders',
+      channelDescription: 'Channel for appointment reminders',
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: true,
+    );
+
+    const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      0,
+      'Appointment Reminder',
+      'You have an appointment with Dr. $doctorName on ${DateFormat('MMMM d, yyyy').format(appointmentDate)} at $timeSlot.',
+      scheduledDate,
+      platformDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dateAndTime,
+    );
+  }
+
+
+  Future<void> showPopUpNotification(
+    {required String title,
+    required String body,
+    bool playSound = true,
+    bool vibrate = true}) async {
+  AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'appointment_channel_id',
+    'Appointment Notifications',
+    channelDescription: 'Channel for appointment notifications',
+    importance: Importance.high,
+    priority: Priority.high,
+    playSound: playSound,
+    enableVibration: vibrate,
+    vibrationPattern: vibrate
+        ? Int64List.fromList([0, 1000, 500, 2000])
+        : Int64List.fromList([0]), // Custom vibration pattern
+  );
+
+  NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+
+  await flutterLocalNotificationsPlugin.show(
+    0, // Notification ID
+    title,
+    body,
+    platformDetails,
+  );
+}
+
   Future<void> _bookAppointment() async {
-    final user = context.read<AuthProvider>().user;
+  final user = context.read<AuthProvider>().user;
 
-    if (_selectedAilment != null && _selectedTimeSlot != null && _selectedWorkDay != null) {
-      _selectedDate = _getNextAvailableDate(_selectedWorkDay!);
+  if (_selectedAilment != null && _selectedTimeSlot != null && _selectedWorkDay != null) {
+    _selectedDate = _getNextAvailableDate(_selectedWorkDay!);
 
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      var appointment = {
-        'doctorId': _selectedDoctorId,
-        'patient_id': user!.uid,
-        'ailment': _selectedAilment,
-        'timeSlot': _selectedTimeSlot,
-        'workDay': _selectedWorkDay,
-        'date': _selectedDate, // Store the selected date
-        'isBooked': true,
-      };
+    print('Selected Ailment: $_selectedAilment');
+    print('Selected Time Slot: $_selectedTimeSlot');
+    print('Selected Work Day: $_selectedWorkDay');
+    print('Selected Date: $_selectedDate');
 
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    var appointment = {
+      'doctorId': _selectedDoctorId,
+      'patient_id': user!.uid,
+      'ailment': _selectedAilment,
+      'timeSlot': _selectedTimeSlot,
+      'workDay': _selectedWorkDay,
+      'date': _selectedDate, // Store the selected date
+      'isBooked': true,
+    };
+
+    try {
       await firestore.collection('appointments').add(appointment);
       await firestore
           .collection('time_slots')
@@ -172,6 +246,33 @@ class _BookingPageState extends State<BookingPage> {
           doc.reference.update({'isBooked': true});
         }
       });
+      DocumentSnapshot doctorDoc = await firestore.collection('doctors').doc(_selectedDoctorId).get();
+      Map<String, dynamic>? data = doctorDoc.data() as Map<String, dynamic>?;
+      String doctorName = data?['name'] ?? 'Unknown Doctor';
+      String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+
+
+      await showPopUpNotification(
+    title: 'Appointment Created',
+    body: 'Your appointment with Dr. $doctorName on $formattedDate at $_selectedTimeSlot has been successfully created.',
+    playSound: true, // Set to false if you don't want sound
+    vibrate: true, // Set to false if you don't want vibration
+  );
+
+
+      if (_selectedDate != null) {
+        await scheduleNotification(
+        appointmentDate: _selectedDate!,
+        doctorName: doctorName,
+        timeSlot: _selectedTimeSlot!,
+      );
+      }
+
+      // Save notification to Firestore
+      await saveNotification(
+        'Upcoming Reminder',
+        'You have an appointment with Dr. $doctorName on $_selectedWorkDay $formattedDate at $_selectedTimeSlot.',
+      );
 
       setState(() {
         _selectedAilment = null;
@@ -185,13 +286,21 @@ class _BookingPageState extends State<BookingPage> {
         content: Text('Appointment booked successfully!'),
         backgroundColor: Colors.green,
       ));
-    } else {
+    } catch (e) {
+      print('Error booking appointment: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please select all required fields.'),
-        backgroundColor: Color.fromARGB(255, 255, 0, 0),
+        content: Text('Failed to book appointment.'),
+        backgroundColor: Colors.red,
       ));
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Please select all required fields.'),
+      backgroundColor: Color.fromARGB(255, 255, 0, 0),
+    ));
   }
+}
+
 
   Widget _buildCard(String day, VoidCallback onTap, bool isSelected) {
     return GestureDetector(
