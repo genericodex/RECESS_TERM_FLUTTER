@@ -48,6 +48,7 @@ class AuthProvider extends ChangeNotifier {
     await _auth.signOut();
     _user = null;
     notifyListeners();
+    
   }
 
 Future<DocumentSnapshot> getUserDetails() async {

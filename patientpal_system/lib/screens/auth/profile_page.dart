@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:patientpal_system/screens/auth/login_page.dart';
 import 'package:patientpal_system/screens/home/home_page.dart';
 import 'package:provider/provider.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
@@ -64,6 +65,16 @@ class _ProfilePageState extends State<ProfilePage> {
         _image = File(pickedFile.path);
       });
     }
+  }
+
+  Future<void> _logout() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.logout();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   @override
@@ -222,6 +233,22 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: GoogleFonts.anuphan(textStyle: TextStyle(fontSize: 18)),
                     ),
                   ),
+                  SizedBox(height: 20),  // Adjust spacing as needed
+                  ElevatedButton(
+                    onPressed: _logout,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white, 
+                      backgroundColor: Colors.redAccent,
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: Text(
+                      'Logout',
+                      style: GoogleFonts.anuphan(textStyle: TextStyle(fontSize: 18)),
+                    ),
+                  )
                 ],
               ),
             ),

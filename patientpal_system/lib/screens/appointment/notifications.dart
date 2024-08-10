@@ -8,35 +8,42 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 
-Future<void> scheduleNotification({
+
+Future<void> scheduleReminderNotification({
+  required String title,
+  required String body,
   required DateTime appointmentDate,
-  required String doctorName,
-  required String timeSlot,
 }) async {
-    final scheduledDate = tz.TZDateTime.from(appointmentDate.subtract(Duration(days: 1)), tz.local);
+  // Calculate the scheduled time, 14 hours before the appointment
+  final scheduledDate = tz.TZDateTime.from(
+    appointmentDate.subtract(Duration(hours: 14)),
+    tz.local,
+  );
 
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'appointment_channel_id',
-      'Appointment Reminders',
-      channelDescription: 'Channel for appointment reminders',
-      importance: Importance.max,
-      priority: Priority.high,
-      playSound: true,
-    );
+  // Define notification details
+  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'reminder_channel_id',
+    'Appointment Reminders',
+    channelDescription: 'Channel for appointment reminders',
+    importance: Importance.high,
+    priority: Priority.high,
+  );
 
-    const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+  const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
-      'Upcoming Reminder',
-      'You have an appointment with Dr. $doctorName on ${DateFormat('MMMM d, yyyy').format(appointmentDate)} at $timeSlot.',
-      scheduledDate,
-      platformDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.dateAndTime,
-    );
-  }
+  // Schedule the notification
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+    1, // Notification ID, should be unique
+    title,
+    body,
+    scheduledDate,
+    platformDetails,
+    androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+    androidAllowWhileIdle: true, // To wake the device if needed
+  );
+}
+  
 
 
 class NotificationsPage extends StatelessWidget {
@@ -130,6 +137,7 @@ Future<void> saveNotification(String title, String body) async {
     'title': title,
     'body': body,
     'timestamp': FieldValue.serverTimestamp(),
+    
   });
 }
 

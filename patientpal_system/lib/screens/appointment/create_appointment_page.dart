@@ -261,10 +261,10 @@ Future<void> _scheduleNotification({
 
 
       if (_selectedDate != null) {
-        await scheduleNotification(
-        appointmentDate: _selectedDate!,
-        doctorName: doctorName,
-        timeSlot: _selectedTimeSlot!,
+        await scheduleReminderNotification(
+        title: 'Appointment Reminder',
+        body: 'Your appointment with Dr. $doctorName is in 15 hours on $formattedDate at $_selectedTimeSlot.',
+        appointmentDate: _selectedDate!, // Pass the selected date,
       );
       }
 
