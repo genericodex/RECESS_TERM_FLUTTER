@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart';
@@ -6,21 +7,63 @@ import 'package:patientpal_system/firebase_options.dart';
 import 'package:patientpal_system/providers/notif_service.dart';
 import 'package:patientpal_system/screens/appointment/create_appointment_page.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:patientpal_system/providers/doctor_provider.dart';
 import 'package:patientpal_system/providers/appointment_provider.dart';
 import 'package:patientpal_system/providers/auth_provider.dart';
 import 'package:patientpal_system/screens/doctor/doctor_registration_page.dart';
 import 'package:patientpal_system/screens/auth/login_page.dart';
 import 'package:patientpal_system/screens/home/home_page.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await Firebase.initializeApp(
+
+     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await NotificationService().init();
+
+    tz.initializeTimeZones();
+
+
+    final InitializationSettings initializationSettings = const InitializationSettings(
+    android: AndroidInitializationSettings('@mipmap/iconlogo'),
+    iOS: DarwinInitializationSettings(),
+    );
+
+   
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    await messaging.requestPermission();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    // Handle foreground messages here
+    if (message.notification != null) {
+      flutterLocalNotificationsPlugin.show(
+        message.notification.hashCode,
+        message.notification!.title,
+        message.notification!.body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'appointment_channel_id',
+            'Appointment Notifications',
+            importance: Importance.max,
+            priority: Priority.high,
+            channelDescription: 'Channel for appointment notifications',
+          ),
+        ),
+        );
+      }
+    });
+
+    
 
     runApp(
       MultiProvider(
@@ -33,6 +76,7 @@ void main() async {
       ),
     );
 
+    // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
     // Generating time slots after initializing the app
     await fetchAppointmentsAndScheduleNotifications();
   } catch (e) {
@@ -67,7 +111,7 @@ Future<void> generateDailyTimeSlots(FirebaseFirestore firestore, String doctorId
         'isBooked': false,
       });
 
-      startDateTime = startDateTime.add(Duration(minutes: 30));
+      startDateTime = startDateTime.add(const Duration(minutes: 30));
     }
 
     for (var slot in timeSlots) {
@@ -106,11 +150,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'PatientPal System',
+      title: 'PatientPal',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
-      home: LoginScreen(),
+      home: const LoginScreen(),
       routes: {
         '/registerDoctor': (context) => DoctorRegistrationPage(),
         '/home': (context) => HomePage(),
@@ -129,7 +173,7 @@ class ErrorApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: Scaffold(
+      home: const Scaffold(
         body: Center(
           child: Text('Error initializing the app. Please try again later.'),
         ),
