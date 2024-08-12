@@ -204,7 +204,7 @@ Future<void> _scheduleNotification({
   NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
 
   await flutterLocalNotificationsPlugin.show(
-    0, // Notification ID
+    1, // Notification ID
     title,
     body,
     platformDetails,
@@ -313,7 +313,7 @@ Future<void> _scheduleNotification({
             color: isSelected ? Color.fromARGB(255, 3, 71, 48) : Color.fromARGB(255, 229, 228, 228),
             width: 1,
           ),
-          color: isSelected ? Color.fromARGB(255, 57, 156, 138) : Colors.grey[50],
+          color: isSelected ? Color.fromARGB(255, 32, 96, 84) : Colors.white,
           borderRadius: BorderRadius.circular(36.0),
         ),
         child: Center(
@@ -338,7 +338,7 @@ Future<void> _scheduleNotification({
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Color.fromARGB(255, 245, 251, 249),
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -364,7 +364,7 @@ Future<void> _scheduleNotification({
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Select Ailment Type',
-                  style: GoogleFonts.anuphan(
+                  style: GoogleFonts.poppins(
                     textStyle: TextStyle(
                       color: Color.fromARGB(255, 22, 4, 56),
                       letterSpacing: .5,
@@ -395,9 +395,13 @@ Future<void> _scheduleNotification({
                   }).toList(),
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 50),
+              Divider(
+                color: Colors.grey[400],
+                thickness: 0.5,
+              ),
               Text('Select Work Day',
-                  style: GoogleFonts.anuphan(
+                  style: GoogleFonts.poppins(
                     textStyle: TextStyle(
                       color: Color.fromARGB(255, 22, 4, 56),
                       letterSpacing: .5,
@@ -433,9 +437,13 @@ Future<void> _scheduleNotification({
                         }).toList(),
                       ),
                     ),
-              SizedBox(height: 16),
+              SizedBox(height: 50),
+              Divider(
+                color: Colors.grey[400],
+                thickness: 0.5,
+              ),
               Text('Select Time',
-                  style: GoogleFonts.anuphan(
+                  style: GoogleFonts.poppins(
                     textStyle: TextStyle(
                       color: Color.fromARGB(255, 22, 4, 56),
                       letterSpacing: .5,
@@ -473,7 +481,7 @@ Future<void> _scheduleNotification({
                                     width: 1,
                                   ),
                                   color: _selectedTimeSlot == slot['time']
-                                      ? Color.fromARGB(255, 57, 156, 138)
+                                      ? Color.fromARGB(255, 32, 96, 84)
                                       : Colors.white,
                                   borderRadius: BorderRadius.circular(25.0),
                                 ),
@@ -536,7 +544,7 @@ Future<void> _scheduleNotification({
                 child: ElevatedButton(
                   onPressed: _bookAppointment,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 57, 156, 138),
+                    backgroundColor: Color.fromARGB(255, 38, 126, 110),
                     foregroundColor: Colors.white,
                     elevation: 3.0,
                     padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),

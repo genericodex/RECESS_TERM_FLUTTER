@@ -220,7 +220,7 @@ Widget _buildHomeContent(String userEmail) {
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [
+                          colors: const [
                             Color.fromARGB(255, 128, 235, 215),
                             Color.fromARGB(255, 57, 156, 138),
                           ],
@@ -305,7 +305,7 @@ Widget _buildHomeContent(String userEmail) {
         //color: Color.fromARGB(255, 249, 247, 247),
         color: Colors.grey[50],
         border: Border.all(color: Color.fromARGB(255, 2, 107, 77), width: .5),
-        boxShadow: [
+        boxShadow: const [
           // BoxShadow(
           //   color: Color.fromARGB(255, 6, 47, 67).withOpacity(0.2),
           //   spreadRadius: 1,

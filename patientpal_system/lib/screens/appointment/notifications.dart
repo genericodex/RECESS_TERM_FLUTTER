@@ -14,11 +14,20 @@ Future<void> scheduleReminderNotification({
   required String body,
   required DateTime appointmentDate,
 }) async {
-  // Calculate the scheduled time, 14 hours before the appointment
+  // Calculate the scheduled time, 15 hours before the appointment
   final scheduledDate = tz.TZDateTime.from(
-    appointmentDate.subtract(Duration(hours: 14)),
+    appointmentDate.subtract(Duration(hours: 20)),
     tz.local,
   );
+
+  print('Appointment Date: $appointmentDate');
+  print('Scheduled Notification Date: $scheduledDate');
+  print('Current Time: ${tz.TZDateTime.now(tz.local)}');
+
+  if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) {
+    print('Error: The scheduled date is not in the future.');
+    return;
+  }
 
   // Define notification details
   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
